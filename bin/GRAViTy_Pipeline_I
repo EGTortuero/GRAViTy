@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/python3
 from GRAViTy.ReadGenomeDescTable import ReadGenomeDescTable
 from GRAViTy.PPHMMDBConstruction import PPHMMDBConstruction
 from GRAViTy.RefVirusAnnotator import RefVirusAnnotator
@@ -688,19 +688,19 @@ def main():
 	
 	options, arguments = parser.parse_args()
 	
-	print "Input for ReadGenomeDescTable:"
-	print "="*100
+	print("Input for ReadGenomeDescTable:")
+	print("="*100)
 	
-	print "\n"
-	print "Main input"
-	print "-"*50
-	print "GenomeDescTableFile: %s"	%options.GenomeDescTableFile
-	print "ShelveDir: %s"		%options.ShelveDir
-	print "Database: %s"		%options.Database
-	print "Database_Header: %s"	%options.Database_Header
-	print "TaxoGrouping_Header: %s"	%options.TaxoGrouping_Header
-	print "TaxoGroupingFile: %s"	%options.TaxoGroupingFile
-	print "="*100
+	print("\n")
+	print("Main input")
+	print("-"*50)
+	print("GenomeDescTableFile: %s"	%options.GenomeDescTableFile)
+	print("ShelveDir: %s"		%options.ShelveDir)
+	print("Database: %s"		%options.Database)
+	print("Database_Header: %s"	%options.Database_Header)
+	print("TaxoGrouping_Header: %s"	%options.TaxoGrouping_Header)
+	print("TaxoGroupingFile: %s"	%options.TaxoGroupingFile)
+	print("="*100)
 	
 	if (options.Database != None and options.Database_Header == None):
 		raise optparse.OptionValueError("You have specified DATABASE as %s, 'Database_Header' cannot be 'None'"%options.Database)
@@ -722,49 +722,49 @@ def main():
 		TaxoGroupingFile	= options.TaxoGroupingFile,
 		)
 	
-	print "Input for PPHMMDBConstruction:"
-	print "="*100
-	print "Main input"
-	print "-"*50
-	print "GenomeSeqFile: %s"		%options.GenomeSeqFile
-	print "ShelveDir: %s"			%options.ShelveDir
+	print("Input for PPHMMDBConstruction:")
+	print("="*100)
+	print("Main input")
+	print("-"*50)
+	print("GenomeSeqFile: %s"		%options.GenomeSeqFile)
+	print("ShelveDir: %s"			%options.ShelveDir)
 	
-	print "\n"
-	print "Protein extraction options"
-	print "-"*50
-	print "ProteinLength_Cutoff: %s"	%options.ProteinLength_Cutoff
-	print "IncludeProteinsFromIncompleteGenomes: %s"%options.IncludeProteinsFromIncompleteGenomes
+	print("\n")
+	print("Protein extraction options")
+	print("-"*50)
+	print("ProteinLength_Cutoff: %s"	%options.ProteinLength_Cutoff)
+	print("IncludeProteinsFromIncompleteGenomes: %s"%options.IncludeProteinsFromIncompleteGenomes)
 	
-	print "\n"
-	print "Protein clustering options"
-	print "-"*50
-	print "BLASTp_evalue_Cutoff: %s"	%options.BLASTp_evalue_Cutoff
-	print "BLASTp_PercentageIden_Cutoff: %s"%options.BLASTp_PercentageIden_Cutoff
-	print "BLASTp_QueryCoverage_Cutoff: %s"	%options.BLASTp_QueryCoverage_Cutoff
-	print "BLASTp_SubjectCoverage_Cutoff: %s"%options.BLASTp_SubjectCoverage_Cutoff
-	print "BLASTp_num_alignments: %s"	%options.BLASTp_num_alignments
-	print "BLASTp_N_CPUs: %s"		%options.BLASTp_N_CPUs
+	print("\n")
+	print("Protein clustering options")
+	print("-"*50)
+	print("BLASTp_evalue_Cutoff: %s"	%options.BLASTp_evalue_Cutoff)
+	print("BLASTp_PercentageIden_Cutoff: %s"%options.BLASTp_PercentageIden_Cutoff)
+	print("BLASTp_QueryCoverage_Cutoff: %s"	%options.BLASTp_QueryCoverage_Cutoff)
+	print("BLASTp_SubjectCoverage_Cutoff: %s"%options.BLASTp_SubjectCoverage_Cutoff)
+	print("BLASTp_num_alignments: %s"	%options.BLASTp_num_alignments)
+	print("BLASTp_N_CPUs: %s"		%options.BLASTp_N_CPUs)
 	
-	print "MUSCLE_GapOpenCost: %s"		%options.MUSCLE_GapOpenCost
-	print "MUSCLE_GapExtendCost: %s"	%options.MUSCLE_GapExtendCost
+	print("MUSCLE_GapOpenCost: %s"		%options.MUSCLE_GapOpenCost)
+	print("MUSCLE_GapExtendCost: %s"	%options.MUSCLE_GapExtendCost)
 	
-	print "ProtClustering_MCLInflation: %s"%options.ProtClustering_MCLInflation
+	print("ProtClustering_MCLInflation: %s"%options.ProtClustering_MCLInflation)
 	
-	print "\n"
-	print "Protein alignment merging options"
-	print "-"*50
-	print "N_AlignmentMerging: %s"		%options.N_AlignmentMerging
+	print("\n")
+	print("Protein alignment merging options")
+	print("-"*50)
+	print("N_AlignmentMerging: %s"		%options.N_AlignmentMerging)
 	
-	print "HHsuite_evalue_Cutoff: %s"	%options.HHsuite_evalue_Cutoff
-	print "HHsuite_pvalue_Cutoff: %s"	%options.HHsuite_pvalue_Cutoff
-	print "HHsuite_N_CPUs: %s"		%options.HHsuite_N_CPUs
-	print "HHsuite_QueryCoverage_Cutoff: %s"%options.HHsuite_QueryCoverage_Cutoff
-	print "HHsuite_SubjectCoverage_Cutoff: %s"%options.HHsuite_SubjectCoverage_Cutoff
+	print("HHsuite_evalue_Cutoff: %s"	%options.HHsuite_evalue_Cutoff)
+	print("HHsuite_pvalue_Cutoff: %s"	%options.HHsuite_pvalue_Cutoff)
+	print("HHsuite_N_CPUs: %s"		%options.HHsuite_N_CPUs)
+	print("HHsuite_QueryCoverage_Cutoff: %s"%options.HHsuite_QueryCoverage_Cutoff)
+	print("HHsuite_SubjectCoverage_Cutoff: %s"%options.HHsuite_SubjectCoverage_Cutoff)
 	
-	print "PPHMMClustering_MCLInflation_ForAlnMerging: %s"%options.PPHMMClustering_MCLInflation_ForAlnMerging
+	print("PPHMMClustering_MCLInflation_ForAlnMerging: %s"%options.PPHMMClustering_MCLInflation_ForAlnMerging)
 	
-	print "HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging: %s"%options.HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging
-	print "="*100
+	print("HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging: %s"%options.HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging)
+	print("="*100)
 	
 	PPHMMDBConstruction (
 		GenomeSeqFile = options.GenomeSeqFile,
@@ -798,40 +798,40 @@ def main():
 		HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging = str2bool(options.HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging),
 		)
 	
-	print "Input for RefVirusAnnotator:"
-	print "="*100
-	print "Main input"
-	print "-"*50
-	print "GenomeSeqFile: %s"		%options.GenomeSeqFile
-	print "ShelveDir: %s"			%options.ShelveDir
+	print("Input for RefVirusAnnotator:")
+	print("="*100)
+	print("Main input")
+	print("-"*50)
+	print("GenomeSeqFile: %s"		%options.GenomeSeqFile)
+	print("ShelveDir: %s"			%options.ShelveDir)
 	
-	print "\n"
-	print "Reference virus annotation options"
-	print "-"*50
-	#print "SeqLength_Cutoff: %s"		%options.SeqLength_Cutoff
-	print "AnnotateIncompleteGenomes: %s"	%options.AnnotateIncompleteGenomes
-	print "HMMER_N_CPUs: %s"		%options.HMMER_N_CPUs
-	print "HMMER_C_EValue_Cutoff: %s"	%options.HMMER_C_EValue_Cutoff
-	print "HMMER_HitScore_Cutoff: %s"	%options.HMMER_HitScore_Cutoff
+	print("\n")
+	print("Reference virus annotation options")
+	print("-"*50)
+	#print("SeqLength_Cutoff: %s"		%options.SeqLength_Cutoff)
+	print("AnnotateIncompleteGenomes: %s"	%options.AnnotateIncompleteGenomes)
+	print("HMMER_N_CPUs: %s"		%options.HMMER_N_CPUs)
+	print("HMMER_C_EValue_Cutoff: %s"	%options.HMMER_C_EValue_Cutoff)
+	print("HMMER_HitScore_Cutoff: %s"	%options.HMMER_HitScore_Cutoff)
 	
-	print "\n"
-	print "Remove singleton PPHMM options"
-	print "-"*50
-	print "RemoveSingletonPPHMMs: %s"	%options.RemoveSingletonPPHMMs
-	print "N_VirusesOfTheClassToIgnore: %s"	%options.N_VirusesOfTheClassToIgnore
+	print("\n")
+	print("Remove singleton PPHMM options")
+	print("-"*50)
+	print("RemoveSingletonPPHMMs: %s"	%options.RemoveSingletonPPHMMs)
+	print("N_VirusesOfTheClassToIgnore: %s"	%options.N_VirusesOfTheClassToIgnore)
 	
-	print "\n"
-	print "PPHMM sorting options"
-	print "-"*50
-	print "PPHMMSorting: %s"		%options.PPHMMSorting
-	print "HHsuite_evalue_Cutoff: %s"	%options.HHsuite_evalue_Cutoff
-	print "HHsuite_pvalue_Cutoff: %s"	%options.HHsuite_pvalue_Cutoff
-	print "HHsuite_N_CPUs: %s"		%options.HHsuite_N_CPUs
-	print "HHsuite_QueryCoverage_Cutoff: %s"%options.HHsuite_QueryCoverage_Cutoff
-	print "HHsuite_SubjectCoverage_Cutoff: %s"%options.HHsuite_SubjectCoverage_Cutoff
+	print("\n")
+	print("PPHMM sorting options")
+	print("-"*50)
+	print("PPHMMSorting: %s"		%options.PPHMMSorting)
+	print("HHsuite_evalue_Cutoff: %s"	%options.HHsuite_evalue_Cutoff)
+	print("HHsuite_pvalue_Cutoff: %s"	%options.HHsuite_pvalue_Cutoff)
+	print("HHsuite_N_CPUs: %s"		%options.HHsuite_N_CPUs)
+	print("HHsuite_QueryCoverage_Cutoff: %s"%options.HHsuite_QueryCoverage_Cutoff)
+	print("HHsuite_SubjectCoverage_Cutoff: %s"%options.HHsuite_SubjectCoverage_Cutoff)
 	
-	print "PPHMMClustering_MCLInflation_ForPPHMMSorting: %s"%options.PPHMMClustering_MCLInflation_ForPPHMMSorting
-	print "="*100
+	print("PPHMMClustering_MCLInflation_ForPPHMMSorting: %s"%options.PPHMMClustering_MCLInflation_ForPPHMMSorting)
+	print("="*100)
 	
 	RefVirusAnnotator (
 		GenomeSeqFile = options.GenomeSeqFile,
@@ -857,45 +857,45 @@ def main():
 		PPHMMClustering_MCLInflation = options.PPHMMClustering_MCLInflation_ForPPHMMSorting,
 		)
 	
-	print "Input for GRAViTyDendrogramAndHeatmapConstruction:"
-	print "="*100
-	print "Main input"
-	print "-"*50
-	print "ShelveDir: %s"				%options.ShelveDir
-	print "AnnotateIncompleteGenomes: %s"		%options.AnnotateIncompleteGenomes
+	print("Input for GRAViTyDendrogramAndHeatmapConstruction:")
+	print("="*100)
+	print("Main input")
+	print("-"*50)
+	print("ShelveDir: %s"				%options.ShelveDir)
+	print("AnnotateIncompleteGenomes: %s"		%options.AnnotateIncompleteGenomes)
 	
-	print "\n"
-	print "Virus (dis)similarity measurement options"
-	print "-"*50
-	print "SimilarityMeasurementScheme: %s"		%options.SimilarityMeasurementScheme
-	print "p: %s"					%options.p
+	print("\n")
+	print("Virus (dis)similarity measurement options")
+	print("-"*50)
+	print("SimilarityMeasurementScheme: %s"		%options.SimilarityMeasurementScheme)
+	print("p: %s"					%options.p)
 	
-	print "\n"
-	print "Dendrogram construction options"
-	print "-"*50
-	print "Dendrogram: %s"				%options.Dendrogram
-	print "Dendrogram_LinkageMethod: %s"		%options.Dendrogram_LinkageMethod
+	print("\n")
+	print("Dendrogram construction options")
+	print("-"*50)
+	print("Dendrogram: %s"				%options.Dendrogram)
+	print("Dendrogram_LinkageMethod: %s"		%options.Dendrogram_LinkageMethod)
 	
-	print "Bootstrap: %s"				%options.Bootstrap
-	print "N_Bootstrap: %s"				%options.N_Bootstrap
-	print "Bootstrap_method: %s"			%options.Bootstrap_method
-	print "Bootstrap_N_CPUs: %s"			%options.Bootstrap_N_CPUs
+	print("Bootstrap: %s"				%options.Bootstrap)
+	print("N_Bootstrap: %s"				%options.N_Bootstrap)
+	print("Bootstrap_method: %s"			%options.Bootstrap_method)
+	print("Bootstrap_N_CPUs: %s"			%options.Bootstrap_N_CPUs)
 	
-	print "\n"
-	print "Heatmap construction options"
-	print "-"*50
-	print "Heatmap: %s"				%options.Heatmap
-	print "Heatmap_VirusOrderScheme: %s"		%options.Heatmap_VirusOrderScheme
+	print("\n")
+	print("Heatmap construction options")
+	print("-"*50)
+	print("Heatmap: %s"				%options.Heatmap)
+	print("Heatmap_VirusOrderScheme: %s"		%options.Heatmap_VirusOrderScheme)
 	
-	print "Heatmap_WithDendrogram: %s"		%options.Heatmap_WithDendrogram
-	print "Heatmap_DendrogramFile: %s"		%options.Heatmap_DendrogramFile
-	print "Heatmap_DendrogramSupport_Cutoff: %s"	%options.Heatmap_DendrogramSupport_Cutoff
+	print("Heatmap_WithDendrogram: %s"		%options.Heatmap_WithDendrogram)
+	print("Heatmap_DendrogramFile: %s"		%options.Heatmap_DendrogramFile)
+	print("Heatmap_DendrogramSupport_Cutoff: %s"	%options.Heatmap_DendrogramSupport_Cutoff)
 	
-	print "\n"
-	print "Virus grouping options"
-	print "-"*50
-	print "VirusGrouping: %s"%options.VirusGrouping
-	print "="*100
+	print("\n")
+	print("Virus grouping options")
+	print("-"*50)
+	print("VirusGrouping: %s"%options.VirusGrouping)
+	print("="*100)
 	
 	GRAViTyDendrogramAndHeatmapConstruction (
 		ShelveDir = options.ShelveDir,
@@ -922,25 +922,25 @@ def main():
 		VirusGrouping = str2bool(options.VirusGrouping),
 		)
 	
-	print "Input for MutualInformationCalculator:"
-	print "="*100
-	print "Main input"
-	print "-"*50
-	print "ShelveDir: %s"%options.ShelveDir
-	print "AnnotateIncompleteGenomes: %s"%options.AnnotateIncompleteGenomes
+	print("Input for MutualInformationCalculator:")
+	print("="*100)
+	print("Main input")
+	print("-"*50)
+	print("ShelveDir: %s"%options.ShelveDir)
+	print("AnnotateIncompleteGenomes: %s"%options.AnnotateIncompleteGenomes)
 	
-	print "\n"
-	print "Virus grouping for mutual information calculation options"
-	print "-"*50
-	print "VirusGroupingFile: %s"%options.VirusGroupingFile
+	print("\n")
+	print("Virus grouping for mutual information calculation options")
+	print("-"*50)
+	print("VirusGroupingFile: %s"%options.VirusGroupingFile)
 	
-	print "\n"
-	print "Virus sampling options"
-	print "-"*50
-	print "N_Sampling: %s"%options.N_Sampling
-	print "SamplingStrategy: %s"%options.SamplingStrategy
-	print "SampleSizePerGroup: %s"%options.SampleSizePerGroup
-	print "="*100
+	print("\n")
+	print("Virus sampling options")
+	print("-"*50)
+	print("N_Sampling: %s"%options.N_Sampling)
+	print("SamplingStrategy: %s"%options.SamplingStrategy)
+	print("SampleSizePerGroup: %s"%options.SampleSizePerGroup)
+	print("="*100)
 	
 	MutualInformationCalculator (
 		ShelveDir = options.ShelveDir,
