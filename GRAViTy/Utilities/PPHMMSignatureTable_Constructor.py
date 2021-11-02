@@ -24,7 +24,7 @@ def PPHMMSignatureTable_Constructor (
 	elif file_extension in [".gb"]:
 		Records_dict = SeqIO.index(GenBankFile, "genbank")
 	
-	Records_dict = {k.split(".")[0]:v for k,v in Records_dict.iteritems()}
+	Records_dict = {k.split(".")[0]:v for k,v in Records_dict.items()}
 	N_Seq = len(SeqIDLists)
 	
 	#Specify PPHMMQueryFile and PPHMMScanOutFile
@@ -38,7 +38,7 @@ def PPHMMSignatureTable_Constructor (
 	PPHMMLocMiddleBestHitTable	= np.empty((0, N_PPHMMs))
 	
 	Seq_i				= 0.0
-	for SeqIDList, TranslTable in zip(SeqIDLists, TranslTableList):
+	for SeqIDList, TranslTable in list(zip(SeqIDLists, TranslTableList)):
 		GenBankSeqList	= []
 		GenBankIDList	= []
 		GenBankDescList	= []
@@ -50,7 +50,7 @@ def PPHMMSignatureTable_Constructor (
 		
 		#sort lists by sequence/segment lengthes
 		#---------------------------------------------------------------------
-		(GenBankSeqLenList, GenBankSeqList,GenBankIDList, GenBankDescList) = zip(*sorted(zip(map(len, map(str, GenBankSeqList)), GenBankSeqList, GenBankIDList, GenBankDescList), reverse = True))
+		(GenBankSeqLenList, GenBankSeqList,GenBankIDList, GenBankDescList) = list(zip(*sorted(list(zip(list(map(len, list(map(str, GenBankSeqList)))), GenBankSeqList, GenBankIDList, GenBankDescList)), reverse = True)))
 		GenBankSeq = ""
 		for seq in GenBankSeqList:
 			GenBankSeq = GenBankSeq+seq
@@ -72,6 +72,9 @@ def PPHMMSignatureTable_Constructor (
 			
 			p = subprocess.Popen("hmmscan --cpu %s --noali --nobias --domtblout %s %s %s" %(HMMER_N_CPUs, PPHMMScanOutFile, HMMER_PPHMMDB, PPHMMQueryFile), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 			out, err = p.communicate()
+			return_code = p.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)             
 			
 			PPHMMIDList			= []
 			PPHMMScoreList			= []

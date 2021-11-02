@@ -6,12 +6,12 @@ def timeout_handler(signum, frame):
 def raw_input_with_timeout(prompt, timelimit = 5, default_input = "Y"):
 	signal.signal(signal.SIGALRM, timeout_handler)
 	signal.alarm(timelimit)
-	input = default_input
+	question = default_input
 	try:
-		input = raw_input(prompt)
+		question = input(prompt)
 		signal.alarm(0)
-	except Exception, exc: 
-		print exc
+	except Exception as exc: 
+		print(exc)
 	
-	return input
+	return question
 

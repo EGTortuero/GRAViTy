@@ -12,7 +12,7 @@ def GOMSignatureTable_Constructor (PPHMMLocationTable, GOMDB, GOMIDList):
 		GOMSignatureList = []
 		Virus_i = 1
 		for PPHMMLocation in PPHMMLocationTable:
-			RelevantPPHMMIndices = np.where(map(any, zip(map(any, GOMDB[GOM].transpose() != 0), PPHMMLocation != 0)))[0]
+			RelevantPPHMMIndices = np.where(list(map(any, list(zip(list(map(any, GOMDB[GOM].transpose() != 0)), PPHMMLocation != 0)))))[0]
 			GOMSignatureList.append(dcor(GOMDB[GOM][:, RelevantPPHMMIndices].transpose(), PPHMMLocation[RelevantPPHMMIndices].reshape(-1,1)))
 			
 			#Progress bar
