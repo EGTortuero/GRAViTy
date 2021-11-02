@@ -29,7 +29,7 @@ def Make_HMMER_PPHMM_DB(HMMER_PPHMMDir, HMMER_PPHMMDB, ClustersDir, Cluster_Meta
 		#-------------------------------------------------------------------------------
 		ClusterSizeList.append(len(Cluster))
 		
-		ClusterSizeByTaxoGroupingList.append(", ".join(["%s: %s"%(TaxoGrouping, N_ProtSeqsInTheTaxoGroup) for TaxoGrouping, N_ProtSeqsInTheTaxoGroup in sorted(Counter(zip(*TaxoLists)[-1]).items(),
+		ClusterSizeByTaxoGroupingList.append(", ".join(["%s: %s"%(TaxoGrouping, N_ProtSeqsInTheTaxoGroup) for TaxoGrouping, N_ProtSeqsInTheTaxoGroup in sorted(Counter(list(zip(*TaxoLists))[-1]).items(),
 																	key = operator.itemgetter(1),
 																	reverse = True
 																	)]
@@ -49,7 +49,7 @@ def Make_HMMER_PPHMM_DB(HMMER_PPHMMDir, HMMER_PPHMMDB, ClustersDir, Cluster_Meta
 		ClusterTaxo_UniqueSubFam,
 		ClusterTaxo_UniqueGenus,
 		ClusterTaxo_UniqueVirusName,
-		ClusterTaxo_UniqueTaxoGroup) = map(lambda TaxoList: list(set(TaxoList)), zip(*TaxoLists))
+		ClusterTaxo_UniqueTaxoGroup) = list(map(lambda TaxoList: list(set(TaxoList)), list(zip(*TaxoLists))))
 		ClusterTaxo = []
 		for ClusterTaxo_UniqueTaxoLabel in [ClusterTaxo_UniqueBaltimoreGroup, ClusterTaxo_UniqueOrder, ClusterTaxo_UniqueFamily, ClusterTaxo_UniqueSubFam, ClusterTaxo_UniqueGenus]:
 			if len(ClusterTaxo_UniqueTaxoLabel) == 1:
@@ -77,7 +77,10 @@ def Make_HMMER_PPHMM_DB(HMMER_PPHMMDir, HMMER_PPHMMDB, ClustersDir, Cluster_Meta
 		HMMER_PPHMMFile = HMMER_PPHMMDir+"/PPHMM_%s.hmm" %PPHMM_i
 		_ = subprocess.Popen("hmmbuild %s %s" %(HMMER_PPHMMFile, AlnClusterFile), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 		out, err = _.communicate()
-		
+		return_code = _.poll()
+		out = out.decode(sys.stdin.encoding)
+		err = err.decode(sys.stdin.encoding)
+
 		#Modify the DESC line in the HMM file to ClusterDesc|ClusterTaxo
 		#-------------------------------------------------------------------------------
 		with open(HMMER_PPHMMFile, "r+") as HMMER_PPHMM_txt:
@@ -99,8 +102,14 @@ def Make_HMMER_PPHMM_DB(HMMER_PPHMMDir, HMMER_PPHMMDB, ClustersDir, Cluster_Meta
 	#-------------------------------------------------------------------------------
 	_ = subprocess.Popen("find %s -name '*.hmm' -exec cat {} \; > %s" %(HMMER_PPHMMDir, HMMER_PPHMMDB), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 	out, err = _.communicate()
+	return_code = _.poll()
+	out = out.decode(sys.stdin.encoding)
+	err = err.decode(sys.stdin.encoding)
 	_ = subprocess.Popen("hmmpress %s" %HMMER_PPHMMDB, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 	out, err = _.communicate()
+	return_code = _.poll()
+	out = out.decode(sys.stdin.encoding)
+	err = err.decode(sys.stdin.encoding)
 	
 	#Make a PPHMMDBSummary file
 	#-------------------------------------------------------------------------------
@@ -155,18 +164,18 @@ def PPHMMDBConstruction (
 	
 	HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging = True,
 	):
-	print "################################################################################"
-	print "#Build a database of virus protein profile hidden Markov models (PPHMMs)       #"
-	print "################################################################################"
+	print("################################################################################")
+	print("#Build a database of virus protein profile hidden Markov models (PPHMMs)       #")
+	print("################################################################################")
 	'''
 	Build a database of virus protein profile hidden Markov models (PPHMMs).
 	---------------------------------------------
 	'''
 	
 	################################################################################
-	print "- Define dir/file paths"
+	print("- Define dir/file paths")
 	################################################################################
-	print "\tto BLASTp shelve directory"
+	print("\tto BLASTp shelve directory")
 	#-------------------------------------------------------------------------------
 	BLASTMainDir		= ShelveDir+"/BLAST"
 	if os.path.exists(BLASTMainDir):
@@ -174,26 +183,26 @@ def PPHMMDBConstruction (
 	
 	os.makedirs(BLASTMainDir)
 	
-	print "\t\tto BLASTp query file"
+	print("\t\tto BLASTp query file")
 	#-------------------------------------------------------------------------------
 	BLASTQueryFile		= BLASTMainDir+"/Query.fasta"
-	print "\t\tto BLASTp subject file"
+	print("\t\tto BLASTp subject file")
 	#-------------------------------------------------------------------------------
 	BLASTSubjectFile	= BLASTMainDir+"/Subjects.fasta"
-	print "\t\tto BLASTp output file"
+	print("\t\tto BLASTp output file")
 	#-------------------------------------------------------------------------------
 	BLASTOutputFile		= BLASTMainDir+"/BLASTOutput.txt"
-	print "\t\tto BLASTp bit score matrix file"
+	print("\t\tto BLASTp bit score matrix file")
 	#-------------------------------------------------------------------------------
 	BLASTBitScoreFile	= BLASTMainDir+"/BitScoreMat.txt"
-	print "\t\tto protein cluster file"
+	print("\t\tto protein cluster file")
 	#-------------------------------------------------------------------------------
 	BLASTProtClusterFile	= BLASTMainDir+"/ProtClusters.txt"
-	print "\t\tto protein cluster directory"
+	print("\t\tto protein cluster directory")
 	#-------------------------------------------------------------------------------
 	ClustersDir		= BLASTMainDir+"/Clusters";os.makedirs(ClustersDir)
 	
-	print "\tto HMMER shelve directory"
+	print("\tto HMMER shelve directory")
 	#-------------------------------------------------------------------------------
 	HMMERDir		= ShelveDir+"/HMMER"
 	if os.path.exists(HMMERDir):
@@ -201,18 +210,18 @@ def PPHMMDBConstruction (
 	
 	os.makedirs(HMMERDir)
 	
-	print "\t\tto HMMER PPHMM directory"
+	print("\t\tto HMMER PPHMM directory")
 	#-------------------------------------------------------------------------------
 	HMMER_PPHMMDir		= HMMERDir+"/HMMER_PPHMMs";os.makedirs(HMMER_PPHMMDir)
-	print "\t\tto HMMER PPHMM database directory"
+	print("\t\tto HMMER PPHMM database directory")
 	#-------------------------------------------------------------------------------
 	HMMER_PPHMMDBDir	= HMMERDir+"/HMMER_PPHMMDB";os.makedirs(HMMER_PPHMMDBDir)
-	print "\t\t\tto HMMER PPHMM database"
+	print("\t\t\tto HMMER PPHMM database")
 	#-------------------------------------------------------------------------------
 	HMMER_PPHMMDB		= HMMER_PPHMMDBDir+"/HMMER_PPHMMDB"
 	
 	if N_AlignmentMerging != 0:
-		print "\tto HHsuite shelve directory"
+		print("\tto HHsuite shelve directory")
 		#-------------------------------------------------------------------------------
 		HHsuiteDir	= ShelveDir+"/HHsuite"
 		if os.path.exists(HHsuiteDir):
@@ -220,25 +229,25 @@ def PPHMMDBConstruction (
 		
 		os.makedirs(HHsuiteDir)
 		
-		print "\t\tto HHsuite PPHMM directory"
+		print("\t\tto HHsuite PPHMM directory")
 		#-------------------------------------------------------------------------------
 		HHsuite_PPHMMDir = HHsuiteDir + "/HHsuite_PPHMMs";os.makedirs(HHsuite_PPHMMDir)
-		print "\t\tto HHsuite PPHMM database directory"
+		print("\t\tto HHsuite PPHMM database directory")
 		#-------------------------------------------------------------------------------
 		HHsuite_PPHMMDBDir= HHsuiteDir +"/HHsuite_PPHMMDB";os.makedirs(HHsuite_PPHMMDBDir)
-		print "\t\t\tto HHsuite PPHMM database"
+		print("\t\t\tto HHsuite PPHMM database")
 		#-------------------------------------------------------------------------------
 		HHsuite_PPHMMDB	= HHsuite_PPHMMDBDir+"/HHsuite_PPHMMDB"
 	
-	print "\tto program output shelve"
+	print("\tto program output shelve")
 	#-------------------------------------------------------------------------------
 	VariableShelveDir 	= ShelveDir+"/Shelves"
 	
 	################################################################################
-	print "- Retrieve variables"
+	print("- Retrieve variables")
 	################################################################################
 	if IncludeIncompleteGenomes == True:
-		print "\tfrom ReadGenomeDescTable.AllGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.AllGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile = VariableShelveDir+"/ReadGenomeDescTable.AllGenomes.shelve"
 		Parameters = shelve.open(VariableShelveFile)
@@ -252,11 +261,11 @@ def PPHMMDBConstruction (
 				"SeqIDLists",
 				"TranslTableList"]:
 			globals()[key] = Parameters[key]
-			print "\t\t"+key
+			print("\t\t"+key)
 		
 		Parameters.close()
 	elif IncludeIncompleteGenomes == False:
-		print "\tfrom ReadGenomeDescTable.CompleteGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.CompleteGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile = VariableShelveDir+"/ReadGenomeDescTable.CompleteGenomes.shelve"
 		Parameters = shelve.open(VariableShelveFile)
@@ -270,33 +279,33 @@ def PPHMMDBConstruction (
 				"SeqIDLists",
 				"TranslTableList"]:
 			globals()[key] = Parameters[key]
-			print "\t\t"+key
+			print("\t\t"+key)
 		
 		Parameters.close()
 	
 	if not os.path.isfile(GenomeSeqFile):
 		################################################################################
-		print "- Download GenBank file"
+		print("- Download GenBank file")
 		################################################################################
-		print "GenomeSeqFile doesn't exist. GRAViTy is downloading the GenBank file(s)"
-		print "Here are the accession numbers to be downloaded: "
-		print "\n".join(map(lambda x:"\n".join(x), SeqIDLists))
+		print("GenomeSeqFile doesn't exist. GRAViTy is downloading the GenBank file(s)")
+		print("Here are the accession numbers to be downloaded: ")
+		print("\n".join(list(map(lambda x:"\n".join(x), SeqIDLists))))       
 		DownloadGenBankFile (GenomeSeqFile = GenomeSeqFile, SeqIDLists = SeqIDLists)
 	
 	################################################################################
-	print "- Read GenBank file"
+	print("- Read GenBank file")
 	################################################################################
 	GenBankDict = SeqIO.index(GenomeSeqFile, "genbank")
-	GenBankDict = {k.split(".")[0]:v for k,v in GenBankDict.iteritems()}
+	GenBankDict = {k.split(".")[0]:v for k,v in GenBankDict.items()}
 	
 	################################################################################
-	print "- Extract/predict protein sequences from virus genomes, excluding proteins with lengthes <%s aa"%ProteinLength_Cutoff
+	print("- Extract/predict protein sequences from virus genomes, excluding proteins with lengthes <%s aa"%ProteinLength_Cutoff)
 	################################################################################
 	ProtList	= []
 	ProtIDList	= []
 	N_Viruses	= len(SeqIDLists)
 	Virus_i		= 1.0
-	for SeqIDList, TranslTable, BaltimoreGroup, Order, Family, SubFam, Genus, VirusName, TaxoGrouping in zip(SeqIDLists, TranslTableList, BaltimoreList, OrderList, FamilyList, SubFamList, GenusList, VirusNameList, TaxoGroupingList):
+	for SeqIDList, TranslTable, BaltimoreGroup, Order, Family, SubFam, Genus, VirusName, TaxoGrouping in list(zip(SeqIDLists, TranslTableList, BaltimoreList, OrderList, FamilyList, SubFamList, GenusList, VirusNameList, TaxoGroupingList)):
 		for SeqID in SeqIDList:
 			GenBankRecord	= GenBankDict[SeqID]
 			GenBankID	= GenBankRecord.name
@@ -305,7 +314,7 @@ def PPHMMDBConstruction (
 			#-------------------------------------------------------------------------------
 			ContainProtAnnotation = 0
 			for Feature in GenBankFeatures:
-				if(Feature.type == 'CDS' and Feature.qualifiers.has_key("protein_id") and Feature.qualifiers.has_key("translation")):
+				if(Feature.type == 'CDS' and Feature.qualifiers.__contains__("protein_id") and Feature.qualifiers.__contains__("translation")):
 					ContainProtAnnotation = 1
 					try:
 						ProtName = Feature.qualifiers["product"][0]
@@ -363,16 +372,16 @@ def PPHMMDBConstruction (
 				elif TranslTable==16:
 					Starts = "----------*---*--------------------M----------------------------"
 				elif TranslTable==17:
-					print "Genetic code table 17 doesn't exist. Use the stardard code"
+					print("Genetic code table 17 doesn't exist. Use the stardard code")
 					Starts = "---M------**--*----M---------------M----------------------------"
 				elif TranslTable==18:
-					print "Genetic code table 18 doesn't exist. Use the stardard code"
+					print("Genetic code table 18 doesn't exist. Use the stardard code")
 					Starts = "---M------**--*----M---------------M----------------------------"
 				elif TranslTable==19:
-					print "Genetic code table 19 doesn't exist. Use the stardard code"
+					print("Genetic code table 19 doesn't exist. Use the stardard code")
 					Starts = "---M------**--*----M---------------M----------------------------"
 				elif TranslTable==20:
-					print "Genetic code table 20 doesn't exist. Use the stardard code"
+					print("Genetic code table 20 doesn't exist. Use the stardard code")
 					Starts = "---M------**--*----M---------------M----------------------------"
 				elif TranslTable==21:
 					Starts = "----------**-----------------------M---------------M------------"
@@ -397,7 +406,7 @@ def PPHMMDBConstruction (
 				elif TranslTable==31:
 					Starts = "----------**-----------------------M----------------------------"
 				else:
-					print "Genetic code table isn't specified or is out of range. Use the stardard code"
+					print("Genetic code table isn't specified or is out of range. Use the stardard code")
 					Starts = "---M------**--*----M---------------M----------------------------"
 				
 				CodonList = [Base1+Base2+Base3 for Base1 in "TCAG" for Base2 in "TCAG" for Base3 in "TCAG"]
@@ -424,7 +433,7 @@ def PPHMMDBConstruction (
 						Coding_End_IndexList = np.array(StopCodon_indices+[len(nuc_codonList)])
 						
 						ProtSeqList = []
-						for i, j in zip(Coding_Start_IndexList, Coding_End_IndexList):
+						for i, j in list(zip(Coding_Start_IndexList, Coding_End_IndexList)):
 							for k, codon in enumerate(nuc_codonList[i:j]):
 								if codon in StartCodonList:
 									ProtSeqList.append(Seq("".join(nuc_codonList[i:j][k:])).translate(table = TranslTable))
@@ -450,33 +459,36 @@ def PPHMMDBConstruction (
 	
 	ProtIDList = np.array(ProtIDList)
 	################################################################################
-	print "- ALL-VERSUS-ALL BLASTp"
+	print("- ALL-VERSUS-ALL BLASTp")
 	################################################################################
-	print "\tMake BLASTp database"
+	print("\tMake BLASTp database")
 	#-------------------------------------------------------------------------------
 	with open(BLASTSubjectFile, "w") as BLASTSubject_txt:
 		SeqIO.write(ProtList, BLASTSubject_txt, "fasta")
 	
 	_ = subprocess.Popen("makeblastdb -in %s -dbtype prot" %BLASTSubjectFile, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 	out, err = _.communicate()
+	return_code = _.poll()
+	out = out.decode(sys.stdin.encoding)
+	err = err.decode(sys.stdin.encoding)    
 	if err != "":
-		print "Something is wrong with makeblastdb:"
-		print "#"*50+"out"+"#"*50
-		print out
-		print "#"*50+"err"+"#"*50
-		print err
-		print "_"*100
+		print("Something is wrong with makeblastdb:")
+		print("#"*50+"out"+"#"*50)
+		print(out)
+		print("#"*50+"err"+"#"*50)
+		print(err)
+		print("_"*100)
 		while True:
 			Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 			if Input == "N" or Input == "n":
 				raise SystemExit("GRAViTy terminated.")
 			elif Input == "Y" or Input == "y":
-				print "Continue GRAViTy."
+				print("Continue GRAViTy.")
 				break
 			else:
-				print "Input can only be 'Y' or 'N'."
+				print("Input can only be 'Y' or 'N'.")
 	
-	print "\tPerforme ALL-VERSUS-ALL BLASTp analysis"
+	print("\tPerforme ALL-VERSUS-ALL BLASTp analysis")
 	#-------------------------------------------------------------------------------
 	BitScoreMat	= []
 	SeenPair	= {}
@@ -503,22 +515,25 @@ def PPHMMDBConstruction (
 																	BLASTp_N_CPUs), stdout = subprocess.PIPE, stderr = subprocess.PIPE,
 																	shell = True)
 		out, err = _.communicate()
+		return_code = _.poll()
+		out = out.decode(sys.stdin.encoding)
+		err = err.decode(sys.stdin.encoding)   
 		if err != "":
-			print "Something is wrong with blastp (protein ID = %s):"%ProtList[ProtSeq_i].id
-			print "#"*50+"out"+"#"*50
-			print out
-			print "#"*50+"err"+"#"*50
-			print err
-			print "_"*100
+			print("Something is wrong with blastp (protein ID = %s):"%ProtList[ProtSeq_i].id)
+			print("#"*50+"out"+"#"*50)
+			print(out)
+			print("#"*50+"err"+"#"*50)
+			print(err)
+			print("_"*100)
 			while True:
 				Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 				if Input == "N" or Input == "n":
 					raise SystemExit("GRAViTy terminated.")
 				elif Input == "Y" or Input == "y":
-					print "Continue GRAViTy."
+					print("Continue GRAViTy.")
 					break
 				else:
-					print "Input can only be 'Y' or 'N'."
+					print("Input can only be 'Y' or 'N'.")
 		
 		#BitScoreMat conditioned on PIden, QCovs, and SCovs
 		#-------------------------------------------------------------------------------
@@ -554,7 +569,7 @@ def PPHMMDBConstruction (
 	sys.stdout.flush()
 	
 	BitScoreMat = np.array(BitScoreMat)
-	print "\tSave protein-protein similarity scores (BLASTp bit scores)"
+	print("\tSave protein-protein similarity scores (BLASTp bit scores)")
 	#-------------------------------------------------------------------------------
 	np.savetxt(	fname	= BLASTBitScoreFile,
 			X	= BitScoreMat,
@@ -563,26 +578,29 @@ def PPHMMDBConstruction (
 			header	= "SeqID_I\tSeqID_II\tBit score")
 	
 	################################################################################
-	print "- Cluster protein sequences based on BLASTp bit scores, using the MCL algorithm"
+	print("- Cluster protein sequences based on BLASTp bit scores, using the MCL algorithm")
 	################################################################################
 	_ = subprocess.Popen("mcl %s --abc -o %s -I %s" %(BLASTBitScoreFile, BLASTProtClusterFile, ProtClustering_MCLInflation), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 	err, out = _.communicate()
+	return_code = _.poll()
+	out = out.decode(sys.stdin.encoding)
+	err = err.decode(sys.stdin.encoding)   
 	if err != "":
-		print "Something is wrong with mcl:"
-		print "#"*50+"out"+"#"*50
-		print out
-		print "#"*50+"err"+"#"*50
-		print err
-		print "_"*100
+		print("Something is wrong with mcl:")
+		print("#"*50+"out"+"#"*50)
+		print(out)
+		print("#"*50+"err"+"#"*50)
+		print(err)
+		print("_"*100)
 		while True:
 			Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 			if Input == "N" or Input == "n":
 				raise SystemExit ("GRAViTy terminated.")
 			elif Input == "Y" or Input == "y":
-				print "Continue GRAViTy."
+				print("Continue GRAViTy.")
 				break
 			else:
-				print "Input can only be 'Y' or 'N'."
+				print("Input can only be 'Y' or 'N'.")
 	
 	SeenProtIDList = []
 	with open(BLASTProtClusterFile, 'r') as BLASTProtCluster_txt:
@@ -593,7 +611,7 @@ def PPHMMDBConstruction (
 		BLASTProtCluster_txt.write("\n".join(list(set(ProtIDList)-set(SeenProtIDList))))
 	
 	################################################################################
-	print "- Make protein alignments"
+	print("- Make protein alignments")
 	################################################################################
 	N_Clusters		= LineCount(BLASTProtClusterFile)+1 #Count the number of clusters
 	Cluster_i		= 0
@@ -624,22 +642,25 @@ def PPHMMDBConstruction (
 													MUSCLE_GapExtendCost),
 													stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 			err, out = _.communicate()
+			return_code = _.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)   
 			if err != "":
-				print "Something is wrong with muscle (Cluster_%s):"%Cluster_i
-				print "#"*50+"out"+"#"*50
-				print out
-				print "#"*50+"err"+"#"*50
-				print err
-				print "_"*100
+				print("Something is wrong with muscle (Cluster_%s):"%Cluster_i)
+				print("#"*50+"out"+"#"*50)
+				print(out)
+				print("#"*50+"err"+"#"*50)
+				print(err)
+				print("_"*100)
 				while True:
 					Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 					if Input == "N" or Input == "n":
 						raise SystemExit("GRAViTy terminated.")
 					elif Input == "Y" or Input == "y":
-						print "Continue GRAViTy."
+						print("Continue GRAViTy.")
 						break
 					else:
-						print "Input can only be 'Y' or 'N'."
+						print("Input can only be 'Y' or 'N'.")
 			
 			#Cluster annotations
 			#-------------------------------------------------------------------------------
@@ -659,11 +680,11 @@ def PPHMMDBConstruction (
 	if N_AlignmentMerging != 0:
 		################################################################################
 		if N_AlignmentMerging > 0:
-			print "- Merge protein alignments, %s rounds of merging" %N_AlignmentMerging
+			print("- Merge protein alignments, %s rounds of merging" %N_AlignmentMerging)
 		elif N_AlignmentMerging < 0:
-			print "- Merge protein alignments until exhausted"
+			print("- Merge protein alignments until exhausted")
 		################################################################################
-		print "\tMake HHsuite PPHMMs from protein alignments"
+		print("\tMake HHsuite PPHMMs from protein alignments")
 		#-------------------------------------------------------------------------------
 		for Cluster_i in range(len(Cluster_MetaDataDict)):
 			AlnClusterFile		= ClustersDir+"/Cluster_%s.fasta" %Cluster_i
@@ -674,22 +695,25 @@ def PPHMMDBConstruction (
 															Cluster_i),
 															stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 			out, err = _.communicate()
+			return_code = _.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)
 			if err != "":
-				print "Something is wrong with turning Cluster_%s into a PPHMM by hhmake." %Cluster_i
-				print "#"*50+"out"+"#"*50
-				print out
-				print "#"*50+"err"+"#"*50
-				print err
-				print "_"*100
+				print("Something is wrong with turning Cluster_%s into a PPHMM by hhmake." %Cluster_i)
+				print("#"*50+"out"+"#"*50)
+				print(out)
+				print("#"*50+"err"+"#"*50)
+				print(err)
+				print("_"*100)
 				while True:
 					Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 					if Input == "N" or Input == "n":
 						raise SystemExit ("GRAViTy terminated.")
 					elif Input == "Y" or Input == "y":
-						print "Continue GRAViTy."
+						print("Continue GRAViTy.")
 						break
 					else:
-						print "Input can only be 'Y' or 'N'."
+						print("Input can only be 'Y' or 'N'.")
 			
 			#Progress bar
 			sys.stdout.write("\033[K" + "Make HHsuite PPHMMs: [%-20s] %d/%d PPHMMs" % ('='*int(float(Cluster_i+1)/len(Cluster_MetaDataDict)*20), Cluster_i+1, len(Cluster_MetaDataDict)) + "\r")
@@ -698,21 +722,24 @@ def PPHMMDBConstruction (
 		sys.stdout.write("\033[K")
 		sys.stdout.flush()
 		
-		print "\tMake a HHsuite PPHMM DB"
+		print("\tMake a HHsuite PPHMM DB")
 		#-------------------------------------------------------------------------------
 		_ = subprocess.Popen("ffindex_build -s %s_hhm.ffdata %s_hhm.ffindex %s" %(HHsuite_PPHMMDB, HHsuite_PPHMMDB, HHsuite_PPHMMDir), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 		out, err = _.communicate()
+		return_code = _.poll()
+		out = out.decode(sys.stdin.encoding)
+		err = err.decode(sys.stdin.encoding)
 		
-		print "\tMerge protein alignments"
+		print("\tMerge protein alignments")
 		#-------------------------------------------------------------------------------
 		AlignmentMerging_i_round = 0
 		while True:
 			if AlignmentMerging_i_round >= N_AlignmentMerging and N_AlignmentMerging >= 0:
-				print "Alignment merging complete"
+				print("Alignment merging complete")
 				break
 			
 			if HMMER_PPHMMDB_ForEachRoundOfPPHMMMerging == True:
-				print "\t\tHMMER_PPHMMDB_ForEachRoundOfPPHMMMerging == True. Make a HMMER PPHMM DB. (Round %s)" %AlignmentMerging_i_round
+				print("\t\tHMMER_PPHMMDB_ForEachRoundOfPPHMMMerging == True. Make a HMMER PPHMM DB. (Round %s)" %AlignmentMerging_i_round)
 				#-------------------------------------------------------------------------------
 				_ = Make_HMMER_PPHMM_DB(	HMMER_PPHMMDir = HMMER_PPHMMDir,
 								HMMER_PPHMMDB = HMMER_PPHMMDBDir+"/HMMER_PPHMMDB_%s" %AlignmentMerging_i_round,
@@ -721,9 +748,12 @@ def PPHMMDBConstruction (
 				
 				_ = subprocess.Popen("find %s -type f -name '*.hmm' -delete" %HMMER_PPHMMDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
+				return_code = _.poll()
+				out = out.decode(sys.stdin.encoding)
+				err = err.decode(sys.stdin.encoding)
 			
-			print "\t\tRound %s"%(AlignmentMerging_i_round + 1)
-			print "\t\t\tDetermine PPHMM-PPHMM similarity scores (ALL-VERSUS-ALL hhsearch)"
+			print("\t\tRound %s"%(AlignmentMerging_i_round + 1))
+			print("\t\t\tDetermine PPHMM-PPHMM similarity scores (ALL-VERSUS-ALL hhsearch)")
 			#-------------------------------------------------------------------------------
 			hhsearchDir		= HHsuiteDir+"/hhsearch_"+"".join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10)); os.makedirs(hhsearchDir)
 			hhsearchOutFile		= hhsearchDir+"/hhsearch.stdout.hhr"
@@ -743,22 +773,25 @@ def PPHMMDBConstruction (
 																	),
 																	stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
+				return_code = _.poll()
+				out = out.decode(sys.stdin.encoding)
+				err = err.decode(sys.stdin.encoding)
 				if err != "":
-					print "Something is wrong with hhsearching PPHMM %s againt the PPHMM database" %PPHMM_i
-					print "#"*50+"out"+"#"*50
-					print out
-					print "#"*50+"err"+"#"*50
-					print err
-					print "_"*100
+					print("Something is wrong with hhsearching PPHMM %s againt the PPHMM database" %PPHMM_i)
+					print("#"*50+"out"+"#"*50)
+					print(out)
+					print("#"*50+"err"+"#"*50)
+					print(err)
+					print("_"*100)
 					while True:
 						Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 						if Input == "N" or Input == "n":
 							raise SystemExit ("GRAViTy terminated.")
 						elif Input == "Y" or Input == "y":
-							print "Continue GRAViTy."
+							print("Continue GRAViTy.")
 							break
 						else:
-							print "Input can only be 'Y' or 'N'."
+							print("Input can only be 'Y' or 'N'.")
 				
 				with open(hhsearchOutFile, 'r') as hhsearchOut_txt:
 					Content		= hhsearchOut_txt.readlines()
@@ -777,7 +810,7 @@ def PPHMMDBConstruction (
 							qcovs		= Col/QueryLength*100
 							scovs		= Col/SubjectLength*100
 							if (evalue <= HHsuite_evalue_Cutoff and pvalue <= HHsuite_pvalue_Cutoff and qcovs >= HHsuite_QueryCoverage_Cutoff and scovs >= HHsuite_SubjectCoverage_Cutoff):
-								Pair	= ", ".join(sorted(map(str,[PPHMM_i, PPHMM_j])))
+								Pair	= ", ".join(sorted(list(map(str,[PPHMM_i, PPHMM_j]))))
 								if Pair in SeenPair: #If the pair has already been seen...
 									if PPHMMSimScore > PPHMMSimScoreCondensedMat[SeenPair[Pair]][2]: #and if the new PPHMMSimScore is higher...
 										PPHMMSimScoreCondensedMat[SeenPair[Pair]][2] = PPHMMSimScore
@@ -788,6 +821,9 @@ def PPHMMDBConstruction (
 				
 				_ = subprocess.Popen("rm %s" %hhsearchOutFile, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
+				return_code = _.poll()
+				out = out.decode(sys.stdin.encoding)
+				err = err.decode(sys.stdin.encoding)
 				
 				#Progress bar
 				sys.stdout.write("\033[K" + "hhsearch: [%-20s] %d/%d PPHMMs" % ('='*int(float(PPHMM_i+1)/N_PPHMMs*20), PPHMM_i+1, N_PPHMMs) + "\r")
@@ -798,8 +834,8 @@ def PPHMMDBConstruction (
 			
 			PPHMMSimScoreCondensedMat	= np.array(PPHMMSimScoreCondensedMat)
 			PPHMMSimScoreMat		= np.zeros((N_PPHMMs, N_PPHMMs))
-			PPHMMSimScoreMat[map(int, PPHMMSimScoreCondensedMat[:,0]), map(int, PPHMMSimScoreCondensedMat[:,1])] = map(float, PPHMMSimScoreCondensedMat[:,2])
-			PPHMMSimScoreMat[map(int, PPHMMSimScoreCondensedMat[:,1]), map(int, PPHMMSimScoreCondensedMat[:,0])] = map(float, PPHMMSimScoreCondensedMat[:,2])
+			PPHMMSimScoreMat[list(map(int, PPHMMSimScoreCondensedMat[:,0])), list(map(int, PPHMMSimScoreCondensedMat[:,1]))] = list(map(float, PPHMMSimScoreCondensedMat[:,2]))
+			PPHMMSimScoreMat[list(map(int, PPHMMSimScoreCondensedMat[:,1])), list(map(int, PPHMMSimScoreCondensedMat[:,0]))] = list(map(float, PPHMMSimScoreCondensedMat[:,2]))
 			PPHMMSimScoreCondensedMat	= np.array([PPHMMSimScorePair for PPHMMSimScorePair in PPHMMSimScoreCondensedMat if PPHMMSimScorePair[0] < PPHMMSimScorePair[1]])
 			
 			PPHMMSimScoreCondensedMatFile	= hhsearchDir+"/PPHMMSimScoreCondensedMat.txt"
@@ -809,34 +845,39 @@ def PPHMMDBConstruction (
 					delimiter= "\t",
 					header	= "PPHMM_i\tPPHMM_j\tPPHMMSimScore")
 			
-			print "\t\t\tCluster PPHMMs based on hhsearch scores, using the MCL algorithm"
+			print("\t\t\tCluster PPHMMs based on hhsearch scores, using the MCL algorithm")
 			#-------------------------------------------------------------------------------
 			PPHMMClustersFile	= hhsearchDir+"/PPHMMClusters.txt"
 			_ = subprocess.Popen("mcl %s --abc -o %s -I %s" %(PPHMMSimScoreCondensedMatFile, PPHMMClustersFile, PPHMMClustering_MCLInflation), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
-			_, out = _.communicate()
-			
+			_ = _.communicate()
+			return_code = _.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)
 			SeenProtIDList = []
 			with open(PPHMMClustersFile, 'r') as PPHMMClusters_txt:
 				for Cluster in PPHMMClusters_txt.readlines():
 					SeenProtIDList.extend(Cluster.split("\n")[0].split("\t"))
 			
 			with open(PPHMMClustersFile, 'a') as PPHMMClusters_txt:
-				PPHMMClusters_txt.write("\n".join(list(set(map(str,map(float,range(0, N_PPHMMs))))-set(SeenProtIDList))))
+				PPHMMClusters_txt.write("\n".join(list(set(list(map(str,map(float,range(0, N_PPHMMs)))))-set(SeenProtIDList))))
 			
-			print "\t\t\tCheck if there are alignments to be merged"
+			print("\t\t\tCheck if there are alignments to be merged")
 			#-------------------------------------------------------------------------------
 			with open(PPHMMClustersFile, 'r') as PPHMMClusters_txt:
 				N_PPHMMs_AfterMerging = len(PPHMMClusters_txt.readlines())
 			
 			if N_PPHMMs_AfterMerging == N_PPHMMs:
-				print "\t\t\t\tNo alignments to be merged. Stop alignment merging process"
+				print("\t\t\t\tNo alignments to be merged. Stop alignment merging process")
 				_ = subprocess.Popen("rm -rf %s" %hhsearchDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
+				return_code = _.poll()
+				out = out.decode(sys.stdin.encoding)
+				err = err.decode(sys.stdin.encoding)
 				break
 			else:
-				print "\t\t\t\tMerge %d alignments to make %d alignments" %(N_PPHMMs, N_PPHMMs_AfterMerging)
+				print("\t\t\t\tMerge %d alignments to make %d alignments" %(N_PPHMMs, N_PPHMMs_AfterMerging))
 			
-			print "\t\t\tMerge protein alignments and remake HHsuite PPHMMs"
+			print("\t\t\tMerge protein alignments and remake HHsuite PPHMMs")
 			#-------------------------------------------------------------------------------
 			SelfSimScoreList				= PPHMMSimScoreMat.diagonal()
 			PPHMMDissimScoreMat				= 1 - np.transpose(PPHMMSimScoreMat**2/SelfSimScoreList)/SelfSimScoreList
@@ -845,7 +886,7 @@ def PPHMMDBConstruction (
 			AfterMergingPPHMM_i				= 1.0
 			with open(PPHMMClustersFile, 'r') as PPHMMClusters_txt:
 				for PPHMMCluster in PPHMMClusters_txt.readlines():
-					PPHMMCluster = map(int, map(float, PPHMMCluster.split("\n")[0].split("\t")))
+					PPHMMCluster = list(map(int, list(map(float, PPHMMCluster.split("\n"))[0].split("\t"))))
 					AfterMergingPPHMM_IndexList.append(min(PPHMMCluster))
 					if len(PPHMMCluster) >= 2:
 						PPHMMDissimScoreMat_Subset = PPHMMDissimScoreMat[PPHMMCluster][:,PPHMMCluster]
@@ -863,6 +904,9 @@ def PPHMMDBConstruction (
 															ClusterFile_i),
 															stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 								err, out = _.communicate()
+								return_code = _.poll()
+								out = out.decode(sys.stdin.encoding)
+								err = err.decode(sys.stdin.encoding)
 								break
 							PPHMM_i, PPHMM_j = sorted([int(m.group(1)),int(m.group(2))])
 							PPHMMTreeNewick = re.sub(r"\((\d+),(\d+)\)", str(PPHMM_i), PPHMMTreeNewick, count=1)
@@ -877,9 +921,14 @@ def PPHMMDBConstruction (
 																			MUSCLE_GapExtendCost),
 																			stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 							err, out = _.communicate()
+							return_code = _.poll()
+							out = out.decode(sys.stdin.encoding)
+							err = err.decode(sys.stdin.encoding)
 							_ = subprocess.Popen("rm %s %s" %(ClusterFile_j, HHsuite_PPHMMFile_j), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 							out, err = _.communicate()
-							
+							return_code = _.poll()
+							out = out.decode(sys.stdin.encoding)
+							err = err.decode(sys.stdin.encoding)
 							Cluster_MetaDataDict[PPHMM_i]["Cluster"]	= Cluster_MetaDataDict[PPHMM_i]["Cluster"] + Cluster_MetaDataDict[PPHMM_j]["Cluster"]
 							Cluster_MetaDataDict[PPHMM_i]["DescList"]	= Cluster_MetaDataDict[PPHMM_i]["DescList"] + Cluster_MetaDataDict[PPHMM_j]["DescList"]
 							Cluster_MetaDataDict[PPHMM_i]["TaxoLists"]	= Cluster_MetaDataDict[PPHMM_i]["TaxoLists"] + Cluster_MetaDataDict[PPHMM_j]["TaxoLists"]
@@ -893,22 +942,25 @@ def PPHMMDBConstruction (
 																		PPHMM_i),
 																		stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 						out, err = _.communicate()
+						return_code = _.poll()
+						out = out.decode(sys.stdin.encoding)
+						err = err.decode(sys.stdin.encoding)
 						if err != "":
-							print "Something is wrong with constructing a PPHMM from cluster %s" %PPHMM_i
-							print "#"*50+"out"+"#"*50
-							print out
-							print "#"*50+"err"+"#"*50
-							print err
-							print "_"*100
+							print("Something is wrong with constructing a PPHMM from cluster %s" %PPHMM_i)
+							print("#"*50+"out"+"#"*50)
+							print(out)
+							print("#"*50+"err"+"#"*50)
+							print(err)
+							print("_"*100)
 							while True:
 								Input = raw_input_with_timeout(prompt = "Would you like to continue? [Y/N]: ", timelimit = 5, default_input = "Y")
 								if Input == "N" or Input == "n":
 									raise SystemExit("GRAViTy terminated.")
 								elif Input == "Y" or Input == "y":
-									print "Continue GRAViTy."
+									print("Continue GRAViTy.")
 									break
 								else:
-									print "Input can only be 'Y' or 'N'."
+									print("Input can only be 'Y' or 'N'.")
 						
 					elif len(PPHMMCluster) == 1:
 						pass
@@ -921,7 +973,7 @@ def PPHMMDBConstruction (
 			sys.stdout.write("\033[K")
 			sys.stdout.flush()
 			
-			print "\t\t\tRename protein alignments and their associated PPHMMs"
+			print("\t\t\tRename protein alignments and their associated PPHMMs")
 			#-------------------------------------------------------------------------------
 			AfterMergingPPHMM_IndexList	= sorted(AfterMergingPPHMM_IndexList)
 			AfterMergingPPHMM_i		= 0
@@ -932,11 +984,17 @@ def PPHMMDBConstruction (
 				ClusterFile_j = ClustersDir+"/Cluster_%s.fasta" %AfterMergingPPHMM_i
 				_ = subprocess.Popen("mv %s %s" %(ClusterFile_i, ClusterFile_j), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
-				
+				return_code = _.poll()
+				out = out.decode(sys.stdin.encoding)
+				err = err.decode(sys.stdin.encoding)
 				HHsuite_PPHMMFile_i = HHsuite_PPHMMDir+"/PPHMM_%s.hhm" %PPHMM_i
 				HHsuite_PPHMMFile_j = HHsuite_PPHMMDir+"/PPHMM_%s.hhm" %AfterMergingPPHMM_i
 				_ = subprocess.Popen("mv %s %s" %(HHsuite_PPHMMFile_i, HHsuite_PPHMMFile_j), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
+				return_code = _.poll()
+				out = out.decode(sys.stdin.encoding)
+				err = err.decode(sys.stdin.encoding)
+                
 				
 				with open(HHsuite_PPHMMFile_j, "r+") as HHsuite_PPHMM_txt:
 					contents = HHsuite_PPHMM_txt.readlines()
@@ -948,29 +1006,41 @@ def PPHMMDBConstruction (
 				
 				AfterMergingPPHMM_i = AfterMergingPPHMM_i + 1
 			
-			print "\t\t\tRebuild the HHsuite PPHMM database\n"
+			print("\t\t\tRebuild the HHsuite PPHMM database\n")
 			#-------------------------------------------------------------------------------
 			_ = subprocess.Popen("rm %s_hhm.ffdata %s_hhm.ffindex" %(HHsuite_PPHMMDB, HHsuite_PPHMMDB), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 			out, err = _.communicate()
+			return_code = _.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)
 			
-			if list(set(map(lambda f: f.split(".")[-1], os.listdir(HHsuite_PPHMMDir))))!=["hhm"]:
-				print "There are some other files/folders other than HHsuite PPHMMs in the folder %s. Remove them first." %HHsuite_PPHMMDir
+			if list(set(list(map(lambda f: f.split("."))[-1], os.listdir(HHsuite_PPHMMDir))))!=["hhm"]:
+				print("There are some other files/folders other than HHsuite PPHMMs in the folder %s. Remove them first." %HHsuite_PPHMMDir)
 			
 			_ = subprocess.Popen("ffindex_build -s %s_hhm.ffdata %s_hhm.ffindex %s" %(HHsuite_PPHMMDB, HHsuite_PPHMMDB, HHsuite_PPHMMDir), stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 			out, err = _.communicate()
+			return_code = _.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)
 			
 			_ = subprocess.Popen("rm -rf %s" %hhsearchDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 			out, err = _.communicate()
+			return_code = _.poll()
+			out = out.decode(sys.stdin.encoding)
+			err = err.decode(sys.stdin.encoding)
 			
 			AlignmentMerging_i_round = AlignmentMerging_i_round + 1
 		
-		print "\tAlignment merging is done. Delete HHsuite shelve directory"
+		print("\tAlignment merging is done. Delete HHsuite shelve directory")
 		#-------------------------------------------------------------------------------
 		_ = subprocess.Popen("rm -rf %s" %HHsuiteDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 		out, err = _.communicate()
+		return_code = _.poll()
+		out = out.decode(sys.stdin.encoding)
+		err = err.decode(sys.stdin.encoding)
 	
 	################################################################################
-	print "- Make HMMER PPHMMDB and its summary file"
+	print("- Make HMMER PPHMMDB and its summary file")
 	################################################################################
 	(ClusterIDList,
 	ClusterDescList,
@@ -984,12 +1054,12 @@ def PPHMMDBConstruction (
 	'''
 	if IncludeIncompleteGenomes == True:
 		################################################################################
-		print "- Save variables to PPHMMDBConstruction.AllGenomes.shelve"
+		print("- Save variables to PPHMMDBConstruction.AllGenomes.shelve")
 		################################################################################
 		VariableShelveFile = VariableShelveDir+"/PPHMMDBConstruction.AllGenomes.shelve"
 	elif IncludeIncompleteGenomes == False:
 		################################################################################
-		print "- Save variables to PPHMMDBConstruction.CompleteGenomes.shelve"
+		print("- Save variables to PPHMMDBConstruction.CompleteGenomes.shelve")
 		################################################################################
 		VariableShelveFile = VariableShelveDir+"/PPHMMDBConstruction.CompleteGenomes.shelve"
 	'''
@@ -1004,7 +1074,7 @@ def PPHMMDBConstruction (
 			]:
 		try:
 			Parameters[key] = locals()[key]
-			print "\t"+key
+			print("\t"+key)
 		except TypeError:
 			pass
 	

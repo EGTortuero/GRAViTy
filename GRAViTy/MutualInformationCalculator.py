@@ -16,35 +16,35 @@ def MutualInformationCalculator (
 	SampleSizePerGroup	= 10,
 	
 	):
-	print "################################################################################"
-	print "#Compute mutual information score                                              #"
-	print "################################################################################"
+	print("################################################################################")
+	print("#Compute mutual information score                                              #")
+	print("################################################################################")
 	'''
 	Compute mutual information scores
 	---------------------------------------------
 	'''
 	################################################################################
-	print "- Define dir/file paths"
+	print("- Define dir/file paths")
 	################################################################################
-	print "\tto program output shelve"
+	print("\tto program output shelve")
 	#-------------------------------------------------------------------------------
 	VariableShelveDir		= ShelveDir+"/Shelves"
 	
-	print "\t\tto Mutual information score directory"
+	print("\t\tto Mutual information score directory")
 	#-------------------------------------------------------------------------------
 	MutualInformationScoreDir	= VariableShelveDir+"/MutualInformationScore"
 	if not os.path.exists(MutualInformationScoreDir):
 		os.makedirs(MutualInformationScoreDir)
 	
 	################################################################################
-	print "- Retrieve variables"
+	print("- Retrieve variables")
 	################################################################################
 	if IncludeIncompleteGenomes == True:
-		print "\tfrom ReadGenomeDescTable.AllGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.AllGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile = VariableShelveDir+"/ReadGenomeDescTable.AllGenomes.shelve"
 	elif IncludeIncompleteGenomes == False:
-		print "\tfrom ReadGenomeDescTable.CompleteGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.CompleteGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile = VariableShelveDir+"/ReadGenomeDescTable.CompleteGenomes.shelve"
 	
@@ -62,16 +62,16 @@ def MutualInformationCalculator (
 			"TaxoGroupingList",
 			]:
 		globals()[key] = Parameters[key]
-		print "\t\t" + key
+		print("\t\t" + key)
 	
 	Parameters.close()
 	
 	if IncludeIncompleteGenomes == True:
-		print "\tfrom RefVirusAnnotator.AllGenomes.shelve"
+		print("\tfrom RefVirusAnnotator.AllGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile = VariableShelveDir+"/RefVirusAnnotator.AllGenomes.shelve"
 	elif IncludeIncompleteGenomes == False:
-		print "\tfrom RefVirusAnnotator.CompleteGenomes.shelve"
+		print("\tfrom RefVirusAnnotator.CompleteGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile = VariableShelveDir+"/RefVirusAnnotator.CompleteGenomes.shelve"
 	
@@ -83,14 +83,14 @@ def MutualInformationCalculator (
 			]:
 		try:
 			globals()[key] = Parameters[key]
-			print "\t\t"+key
+			print("\t\t"+key)
 		except KeyError:
 			pass
 	
 	Parameters.close()
 	if "PPHMMSignatureTable_coo" in globals().keys():	globals()["PPHMMSignatureTable"] = PPHMMSignatureTable_coo.toarray()
 	
-	print "\tfrom PPHMMDBConstruction.shelve"
+	print("\tfrom PPHMMDBConstruction.shelve")
 	#-------------------------------------------------------------------------------
 	VariableShelveFile = VariableShelveDir+"/PPHMMDBConstruction.shelve"
 	Parameters = shelve.open(VariableShelveFile)
@@ -98,18 +98,18 @@ def MutualInformationCalculator (
 			"ClusterDescList",
 			]:
 		globals()[key] = Parameters[key]
-		print "\t\t" + key
+		print("\t\t" + key)
 	
 	Parameters.close()
 	
-	PPHMMDesc = map(lambda ClusterDesc: "PPHMM|"+ClusterDesc, ClusterDescList)
+	PPHMMDesc = list(map(lambda ClusterDesc: "PPHMM|"+ClusterDesc, ClusterDescList))
 	PPHMMDesc = np.array(PPHMMDesc)
 	
 	if VirusGroupingFile == None:
 		VirusGroupingDict = {"Overvall":TaxoGroupingList}
 	else:
 		################################################################################
-		print "- Read virus grouping file"
+		print("- Read virus grouping file")
 		################################################################################
 		VirusGroupingTable = []
 		with open(VirusGroupingFile, "r") as VirusGrouping_txt:
@@ -120,17 +120,17 @@ def MutualInformationCalculator (
 				VirusGroupingTable.append(Line)
 		
 		VirusGroupingTable = np.array(VirusGroupingTable).T
-		VirusGroupingDict = {VirusGroupingScheme:np.array(VirusGroupingList) for VirusGroupingScheme, VirusGroupingList in zip(VirusGroupingSchemeList, VirusGroupingTable)}
+		VirusGroupingDict = {VirusGroupingScheme:np.array(VirusGroupingList) for VirusGroupingScheme, VirusGroupingList in list(zip(VirusGroupingSchemeList, VirusGroupingTable))}
 		VirusGroupingDict = {"Overvall":TaxoGroupingList}
 	
 	################################################################################
-	print "- Compute mutual information between PPHMM scores and virus classification"
+	print("- Compute mutual information between PPHMM scores and virus classification")
 	################################################################################
 	ResultDict		= {}
 	N_PPHMMs		= len(PPHMMDesc)
 	N_VirusGroupingSchemes	= len(VirusGroupingDict)
 	VirusGroupingScheme_i	= 1.0
-	for VirusGroupingScheme, VirusGroupingList in VirusGroupingDict.iteritems():
+	for VirusGroupingScheme, VirusGroupingList in VirusGroupingDict.items():
 		#Compute mutual information between PPHMM scores and virus classification
 		#-------------------------------------------------------------------------------
 		ResultDict[VirusGroupingScheme]	= {}
@@ -148,10 +148,10 @@ def MutualInformationCalculator (
 				SampledVirus_IndexList = np.where([VirusGroupingID != "-" for VirusGroupingID in VirusGroupingList])[0]
 				
 			elif SamplingStrategy == "balance_without_repeat":
-				SampledVirus_IndexList = sum(map(lambda VirusGroupingID: list(np.random.permutation(np.where(VirusGroupingList == VirusGroupingID)[0])[:SampleSizePerGroup]), VirusGroupingIDList),[])
+				SampledVirus_IndexList = sum(list(map(lambda VirusGroupingID: list(np.random.permutation(np.where(VirusGroupingList == VirusGroupingID)[0])[:SampleSizePerGroup]), VirusGroupingIDList)),[])
 				
 			elif SamplingStrategy == "balance_with_repeat":
-				SampledVirus_IndexList = sum(map(lambda VirusGroupingID: list(np.random.choice(a = np.where(VirusGroupingList == VirusGroupingID)[0], size = SampleSizePerGroup, replace = True)), VirusGroupingIDList),[])
+				SampledVirus_IndexList = sum(list(map(lambda VirusGroupingID: list(np.random.choice(a = np.where(VirusGroupingList == VirusGroupingID)[0], size = SampleSizePerGroup, replace = True)), VirusGroupingIDList)),[])
 			
 			SampledMutualInformationTable.append(mutual_info_classif(PPHMMSignatureTable_Subset[SampledVirus_IndexList], VirusGroupingList[SampledVirus_IndexList]))
 			
@@ -169,19 +169,15 @@ def MutualInformationCalculator (
 		
 		#Sort the PPHMMs according to mutual information scores
 		#-------------------------------------------------------------------------------
-		PPHMMOrder = list(zip(*sorted(	[(AverageMutualInformationScore_i, AverageMutualInformationScore) for AverageMutualInformationScore_i, AverageMutualInformationScore in enumerate(AverageMutualInformationScoreList)],
-						key = lambda x: x[1],
-						reverse = True,
-						)
-					)[0]
-				)
+		PPHMMOrder = list(next(zip(*sorted(	[(AverageMutualInformationScore_i, AverageMutualInformationScore) for AverageMutualInformationScore_i, AverageMutualInformationScore in enumerate(AverageMutualInformationScoreList)],
+						key = lambda x: x[1], reverse = True, ))))
 		ResultDict[VirusGroupingScheme]["AverageMutualInformationScoreList"] = AverageMutualInformationScoreList[PPHMMOrder]
 		ResultDict[VirusGroupingScheme]["PPHMMDesc"] = IngroupVirus_PPHMMDesc[PPHMMOrder]
 		ResultDict[VirusGroupingScheme]["PPHMMSignatureTable"] = PPHMMSignatureTable_Subset[:,PPHMMOrder]
 		
 		#Write the results to file
 		#-------------------------------------------------------------------------------
-		Dat	= np.column_stack((	map(", ".join, SeqIDLists),
+		Dat	= np.column_stack((	list(map(", ".join, SeqIDLists)),
 						VirusNameList,
 						BaltimoreList,
 						OrderList,
@@ -210,12 +206,12 @@ def MutualInformationCalculator (
 	
 	if IncludeIncompleteGenomes == True:
 		################################################################################
-		print "- Save variables to MutualInformationCalculator.AllGenomes.shelve"
+		print("- Save variables to MutualInformationCalculator.AllGenomes.shelve")
 		################################################################################
 		VariableShelveFile = VariableShelveDir+"/MutualInformationCalculator.AllGenomes.shelve"
 	elif IncludeIncompleteGenomes == False:
 		################################################################################
-		print "- Save variables to MutualInformationCalculator.CompleteGenomes.shelve"
+		print("- Save variables to MutualInformationCalculator.CompleteGenomes.shelve")
 		################################################################################
 		VariableShelveFile = VariableShelveDir+"/MutualInformationCalculator.CompleteGenomes.shelve"
 	
@@ -224,7 +220,7 @@ def MutualInformationCalculator (
 	for key in ["ResultDict"]:
 		try:
 			Parameters[key] = locals()[key]
-			print "\t" + key
+			print("\t" + key)
 		except TypeError:
 			pass
 	

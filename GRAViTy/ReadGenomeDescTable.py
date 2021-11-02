@@ -11,9 +11,9 @@ def ReadGenomeDescTable (
 	TaxoGroupingFile	= None,
 	):
 	
-	print "################################################################################"
-	print "#Read the GenomeDesc table                                                     #"
-	print "################################################################################"
+	print("################################################################################")
+	print("#Read the GenomeDesc table                                                     #")
+	print("################################################################################")
 	'''
 	Read genome description table (Virus Metadata Resource -- VMR)
 	---------------------------------------------
@@ -50,16 +50,16 @@ def ReadGenomeDescTable (
 	28		= Taxonomic grouping
 	'''
 	################################################################################
-	print "- Define dir/file paths"
+	print("- Define dir/file paths")
 	################################################################################
-	print "\tto program output shelve"
+	print("\tto program output shelve")
 	#-------------------------------------------------------------------------------
 	VariableShelveDir = ShelveDir+"/Shelves"
 	if not os.path.exists(VariableShelveDir):
 		os.makedirs(VariableShelveDir)
 	
 	################################################################################
-	print "- Read the GenomeDesc table"
+	print("- Read the GenomeDesc table")
 	################################################################################
 	BaltimoreList	= []
 	OrderList	= []
@@ -82,8 +82,8 @@ def ReadGenomeDescTable (
 	with open(GenomeDescTableFile, "r") as GenomeDescTable_txt:
 		header = next(GenomeDescTable_txt)
 		header = header.split("\r\n")[0].split("\n")[0].split("\t")
-		
-		Baltimore_i	= header.index("Baltimore Group")
+        
+		Baltimore_i	= header.index("Genome composition")
 		#Realm_i		= header.index("Realm")
 		#Subrealm_i	= header.index("Subrealm")
 		#Kingdom_i	= header.index("Kingdom")
@@ -99,12 +99,12 @@ def ReadGenomeDescTable (
 		Genus_i		= header.index("Genus")
 		#Subgenus_i	= header.index("Subgenus")
 		#Species_i	= header.index("Species")
-		VirusName_i	= header.index("Virus name (s)")
+		VirusName_i	= header.index("Virus name(s)")
 		
 		SeqID_i		= header.index("Virus GENBANK accession")
-		SeqStatus_i	= header.index("Virus sequence complete")
+		SeqStatus_i	= header.index("Genome coverage")
 		TranslTable_i	= header.index("Genetic code table")
-		
+        
 		#if Database != None: Database_i	= header.index(Database_Header)
 		if Database_Header != None: Database_i	= header.index(Database_Header)
 		
@@ -134,7 +134,7 @@ def ReadGenomeDescTable (
 				try:
 					TranslTableList.append(int(Line[TranslTable_i]))
 				except ValueError:
-					print ("Genetic code is not specified. GRAViTy will use the standard code for %s"%VirusNameList[-1])
+					print("Genetic code is not specified. GRAViTy will use the standard code for %s"%VirusNameList[-1])
 					TranslTableList.append(1)
 				#if Database != None: DatabaseList.append(Line[Database_i])
 				if Database_Header != None: DatabaseList.append(Line[Database_i])
@@ -157,7 +157,7 @@ def ReadGenomeDescTable (
 				try:
 					TranslTableList.append(int(Line[TranslTable_i]))
 				except ValueError:
-					print ("Genetic code is not specified. GRAViTy will use the standard code for %s"%VirusNameList[-1])
+					print("Genetic code is not specified. GRAViTy will use the standard code for %s"%VirusNameList[-1])
 					TranslTableList.append(1)
 				#if Database != None: DatabaseList.append(Line[Database_i])
 				if Database_Header != None: DatabaseList.append(Line[Database_i])
@@ -182,7 +182,7 @@ def ReadGenomeDescTable (
 	#HostDomainList	= np.array(HostDomainList)
 	
 	SeqIDLists	.extend([[1],[1,2]])	#making sure that SeqIDLists will be a h list (and not a v list)
-	SeqIDLists	= np.array(SeqIDLists)
+	SeqIDLists	= np.array(SeqIDLists, dtype=object)
 	SeqIDLists	= SeqIDLists[:-2]
 	
 	#Check if there exist duplicated accession numbers
@@ -190,8 +190,8 @@ def ReadGenomeDescTable (
 	SeqIDFlatList 	= [SeqID for SeqIDList in SeqIDLists for SeqID in SeqIDList]
 	if len(SeqIDFlatList) != len(set(SeqIDFlatList)):
 		from collections import Counter
-		print "The following accession numbers appear more than once: "
-		print "\n".join([SeqID for SeqID, count in Counter(SeqIDFlatList).iteritems() if count > 1])
+		print("The following accession numbers appear more than once: ")
+		print("\n".join([SeqID for SeqID, count in Counter(SeqIDFlatList).items() if count > 1]))
 		raise SystemExit("GRAViTy terminated.")
 	
 	SeqStatusList	= np.array(SeqStatusList)
@@ -201,7 +201,7 @@ def ReadGenomeDescTable (
 	#NoteList	= np.array(NoteList)
 	'''
 	################################################################################
-	print "- Clean the host annotations"
+	print("- Clean the host annotations")
 	################################################################################
 	VertVirus	= ["vertebrates" in Host.replace('"','').split(", ") or "human" in Host.replace('"','').split(", ") for Host in HostList]
 	InvertVirus	= ["invertebrates" in Host.replace('"','').split(", ") for Host in HostList]
@@ -241,7 +241,7 @@ def ReadGenomeDescTable (
 	HostList=np.array(Cleaned_HostList)
 	'''
 	################################################################################
-	print "- Save variables to ReadGenomeDescTable.AllGenomes.shelve"
+	print("- Save variables to ReadGenomeDescTable.AllGenomes.shelve")
 	################################################################################
 	if Database != None:
 		IncludedGenomes_IndexList = np.where(DatabaseList==Database)[0]
@@ -282,14 +282,14 @@ def ReadGenomeDescTable (
 			]:
 		try:
 			Parameters[key] = locals()[key]
-			print "\t" + key
+			print("\t" + key)
 		except TypeError:
 			pass
 	
 	Parameters.close()
 	
 	################################################################################
-	print "- Save variables to ReadGenomeDescTable.CompleteGenomes.shelve"
+	print("- Save variables to ReadGenomeDescTable.CompleteGenomes.shelve")
 	################################################################################
 	IncludedGenomes_IndexList = [SeqStatus_i for SeqStatus_i, SeqStatus in enumerate(SeqStatusList) if "Complete" in SeqStatus]
 	
@@ -329,7 +329,7 @@ def ReadGenomeDescTable (
 			]:
 		try:
 			Parameters[key] = locals()[key]
-			print "\t" + key
+			print("\t" + key)
 		except TypeError:
 			pass
 	
