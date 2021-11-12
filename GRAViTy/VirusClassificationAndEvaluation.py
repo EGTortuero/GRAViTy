@@ -777,11 +777,11 @@ def VirusClassificationAndEvaluation (
 			#-------------------------------------------------------------------------------
 			N_InternalNodes = len(VirusDendrogram.get_nonterminals())
 			for InternalNode_i in range(N_InternalNodes):
-				if VirusDendrogram.get_nonterminals()[InternalNode_i].confidence >= Heatmap_DendrogramSupport_Cutoff:
-					VirusDendrogram.get_nonterminals()[InternalNode_i].confidence = round(VirusDendrogram.get_nonterminals()[InternalNode_i].confidence, 2)
+				if VirusDendrogram.get_nonterminals()[InternalNode_i].confidence is None or VirusDendrogram.get_nonterminals()[InternalNode_i].confidence < Heatmap_DendrogramSupport_Cutoff or np.isnan(VirusDendrogram.get_nonterminals()[InternalNode_i].confidence):
+					VirusDendrogram.get_nonterminals()[InternalNode_i].confidence = 0
 				else:
-					VirusDendrogram.get_nonterminals()[InternalNode_i].confidence=""
-			
+					VirusDendrogram.get_nonterminals()[InternalNode_i].confidence = int(round(VirusDendrogram.get_nonterminals()[InternalNode_i].confidence, 2)*100)
+                    			
 			#Colour terminal branches: reference virus's branch is blue, unclassified virus's branch is red
 			#-------------------------------------------------------------------------------
 			N_Viruses = N_RefViruses + N_UcfViruses
