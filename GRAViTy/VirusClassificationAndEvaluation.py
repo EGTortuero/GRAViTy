@@ -116,12 +116,12 @@ def PairwiseSimilarityScore_Cutoff_Dict_Constructor (SimMat, TaxoGroupingList, N
 	return PairwiseSimilarityScore_Cutoff_Dict
 
 def TaxonomicAssignmentProposerAndEvaluator (SimMat_UcfVirusesVSRefViruses, TaxoGroupingList_RefVirus, VirusDendrogram, TaxoLabelList_RefVirus, TaxoLabelList_UcfVirus, PairwiseSimilarityScore_Cutoff_Dict):
-	print "\t\tPropose a taxonomic class to each unclassified viruses, using the 1-nearest neighbour algorithm"
+	print("\t\tPropose a taxonomic class to each unclassified viruses, using the 1-nearest neighbour algorithm")
 	#-------------------------------------------------------------------------------
 	MaxSimScoreList			= np.max(SimMat_UcfVirusesVSRefViruses, axis = 1)
 	TaxoOfMaxSimScoreList		= TaxoGroupingList_RefVirus[np.argmax(SimMat_UcfVirusesVSRefViruses, axis = 1)]
 	
-	print "\t\tEvaluate the taxonomic assignments"
+	print("\t\tEvaluate the taxonomic assignments")
 	#-------------------------------------------------------------------------------
 	#Rename the reference virus leaves in the dendrogram to class label
 	#-------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ def VirusClassificationAndEvaluation (
 	
 	SimilarityMeasurementScheme		= "PG",
 	p					= 1,
-	Dendrogram_LinkageMethod		= "average", #’single’, ’complete’, ’average’, ’weighted’
+	Dendrogram_LinkageMethod		= "average", #single, complete, average, weighted
 	
 	DatabaseAssignmentSimilarityScore_Cutoff	= 0.01,
 	N_PairwiseSimilarityScores		= 10000,
@@ -246,32 +246,32 @@ def VirusClassificationAndEvaluation (
 	
 	if UseUcfVirusPPHMMs == True:
 		if GenomeSeqFiles_RefVirus == None or GenomeSeqFile_UcfVirus == None:
-			print "'UseUcfVirusPPHMMs' == True. 'GenomeSeqFiles_RefVirus' and 'GenomeSeqFile_UcfVirus' cannot be None"
+			print("'UseUcfVirusPPHMMs' == True. 'GenomeSeqFiles_RefVirus' and 'GenomeSeqFile_UcfVirus' cannot be None")
 			return None
 		
 		GenomeSeqFiles_RefVirus = GenomeSeqFiles_RefVirus.split(", ")
 		if len(ShelveDirs_RefVirus) != len(GenomeSeqFiles_RefVirus):
-			print "Length of 'ShelveDirs_RefVirus' should be equal to that of 'GenomeSeqFiles_RefVirus'"
+			print("Length of 'ShelveDirs_RefVirus' should be equal to that of 'GenomeSeqFiles_RefVirus'")
 			return None
 	else:
 		GenomeSeqFiles_RefVirus = [None]*len(ShelveDirs_RefVirus)
 	
-	print "################################################################################"
-	print "#Classify virus and evaluate the results                                       #"
-	print "################################################################################"
+	print("################################################################################")
+	print("#Classify virus and evaluate the results                                       #")
+	print("################################################################################")
 	'''
 	Classify virus and evaluate the results
 	---------------------------------------------
 	'''
 	################################################################################
-	print "- Define dir/file paths"
+	print("- Define dir/file paths")
 	################################################################################
-	print "\tto program output shelve"
+	print("\tto program output shelve")
 	#-------------------------------------------------------------------------------
 	VariableShelveDir_UcfVirus	= ShelveDir_UcfVirus+"/Shelves"
 	
 	if UseUcfVirusPPHMMs == True:
-		print "\t\tto HMMER PPHMM database of unclassified viruses"
+		print("\t\tto HMMER PPHMM database of unclassified viruses")
 		#-------------------------------------------------------------------------------
 		HMMERDir_UcfVirus		= ShelveDir_UcfVirus+"/HMMER"
 		HMMER_PPHMMDBDir_UcfVirus	= HMMERDir_UcfVirus+"/HMMER_PPHMMDB"
@@ -279,19 +279,19 @@ def VirusClassificationAndEvaluation (
 		if not os.path.exists(HMMER_PPHMMDB_UcfVirus):
 			return "Can't find HMMER PPHMM database of unclassified viruses"
 	
-	print "\t\tto virus classification result file"
+	print("\t\tto virus classification result file")
 	#-------------------------------------------------------------------------------
 	ClassificationResultFile = VariableShelveDir_UcfVirus+"/ClassificationResults.txt"
 	
 	################################################################################
-	print "- Retrieve variables related to unclassified viruses"
+	print("- Retrieve variables related to unclassified viruses")
 	################################################################################
 	if IncludeIncompleteGenomes_UcfVirus == True:
-		print "\tfrom ReadGenomeDescTable.AllGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.AllGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/ReadGenomeDescTable.AllGenomes.shelve"
 	elif IncludeIncompleteGenomes_UcfVirus == False:
-		print "\tfrom ReadGenomeDescTable.CompleteGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.CompleteGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/ReadGenomeDescTable.CompleteGenomes.shelve"
 	
@@ -304,7 +304,7 @@ def VirusClassificationAndEvaluation (
 			"TranslTableList",
 			]:
 		globals()[key] = Parameters[key]
-		print "\t\t" + key
+		print("\t\t" + key)
 	
 	Parameters.close()
 	
@@ -314,20 +314,20 @@ def VirusClassificationAndEvaluation (
 	
 	if IncludeIncompleteGenomes_UcfVirus == True:
 		if IncludeIncompleteGenomes_RefVirus == True:
-			print "\tfrom UcfVirusAnnotator.AllUcfGenomes.AllRefGenomes.shelve"
+			print("\tfrom UcfVirusAnnotator.AllUcfGenomes.AllRefGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.AllUcfGenomes.AllRefGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
-			print "\tfrom UcfVirusAnnotator.AllUcfGenomes.CompleteRefGenomes.shelve"
+			print("\tfrom UcfVirusAnnotator.AllUcfGenomes.CompleteRefGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.AllUcfGenomes.CompleteRefGenomes.shelve"
 	elif IncludeIncompleteGenomes_UcfVirus == False:
 		if IncludeIncompleteGenomes_RefVirus == True:
-			print "\tfrom UcfVirusAnnotator.CompleteUcfGenomes.AllRefGenomes.shelve"
+			print("\tfrom UcfVirusAnnotator.CompleteUcfGenomes.AllRefGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.CompleteUcfGenomes.AllRefGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
-			print "\tfrom UcfVirusAnnotator.CompleteUcfGenomes.CompleteRefGenomes.shelve"
+			print("\tfrom UcfVirusAnnotator.CompleteUcfGenomes.CompleteRefGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.CompleteUcfGenomes.CompleteRefGenomes.shelve"
 	
@@ -342,14 +342,14 @@ def VirusClassificationAndEvaluation (
 			]:
 		try:
 			globals()[key] = Parameters[key]
-			print "\t\t"+key
+			print("\t\t"+key)
 		except KeyError:
 			pass
 	
 	Parameters.close()
 	
-	if "PPHMMSignatureTable_Dict_coo" in globals().keys():	globals()["PPHMMSignatureTable_Dict"] = {RefVirusGroup:PPHMMSignatureTable_coo.toarray() for RefVirusGroup, PPHMMSignatureTable_coo in PPHMMSignatureTable_Dict_coo.iteritems()}
-	if "PPHMMLocationTable_Dict_coo" in globals().keys():	globals()["PPHMMLocationTable_Dict"] = {RefVirusGroup:PPHMMLocationTable_coo.toarray() for RefVirusGroup, PPHMMLocationTable_coo in PPHMMLocationTable_Dict_coo.iteritems()}
+	if "PPHMMSignatureTable_Dict_coo" in globals().keys():	globals()["PPHMMSignatureTable_Dict"] = {RefVirusGroup:PPHMMSignatureTable_coo.toarray() for RefVirusGroup, PPHMMSignatureTable_coo in PPHMMSignatureTable_Dict_coo.items()}
+	if "PPHMMLocationTable_Dict_coo" in globals().keys():	globals()["PPHMMLocationTable_Dict"] = {RefVirusGroup:PPHMMLocationTable_coo.toarray() for RefVirusGroup, PPHMMLocationTable_coo in PPHMMLocationTable_Dict_coo.items()}
 	
 	PPHMMSignatureTable_UcfVirus_Dict = copy(PPHMMSignatureTable_Dict)
 	PPHMMLocationTable_UcfVirus_Dict = copy(PPHMMLocationTable_Dict)
@@ -357,9 +357,9 @@ def VirusClassificationAndEvaluation (
 	
 	if UseUcfVirusPPHMMs == True:
 		################################################################################
-		print "- Scan unclassified viruses against their PPHMM DB to create additional PPHMMSignatureTable, and PPHMMLocationTable"
+		print("- Scan unclassified viruses against their PPHMM DB to create additional PPHMMSignatureTable, and PPHMMLocationTable")
 		################################################################################
-		print "\tGenerate PPHMMSignatureTable, and PPHMMLocationTable"
+		print("\tGenerate PPHMMSignatureTable, and PPHMMLocationTable")
 		#-------------------------------------------------------------------------------
 		#Make HMMER_hmmscanDir
 		#-------------------------------------------------------------------------------
@@ -382,15 +382,12 @@ def VirusClassificationAndEvaluation (
 		#-------------------------------------------------------------------------------
 		_ = subprocess.call("rm -rf %s" %HMMER_hmmscanDir_UcfVirus, shell = True)
 		
-		print "\tUpdate unclassified viruses' PPHMMSignatureTables, and PPHMMLocationTables"
+		print("\tUpdate unclassified viruses' PPHMMSignatureTables, and PPHMMLocationTables")
 		#-------------------------------------------------------------------------------
-		PPHMMSignatureTable_UcfVirus_Dict = {RefVirusGroup: np.hstack((PPHMMSignatureTable_UcfVirusVSRefDB, PPHMMSignatureTable_UcfVirusVSUcfDB)) for RefVirusGroup, PPHMMSignatureTable_UcfVirusVSRefDB in PPHMMSignatureTable_UcfVirus_Dict.iteritems()}
-		PPHMMLocationTable_UcfVirus_Dict = {RefVirusGroup: np.hstack((PPHMMLocationTable_UcfVirusVSRefDB, PPHMMLocationTable_UcfVirusVSUcfDB)) for RefVirusGroup, PPHMMLocationTable_UcfVirusVSRefDB in PPHMMLocationTable_UcfVirus_Dict.iteritems()}
+		PPHMMSignatureTable_UcfVirus_Dict = {RefVirusGroup: np.hstack((PPHMMSignatureTable_UcfVirusVSRefDB, PPHMMSignatureTable_UcfVirusVSUcfDB)) for RefVirusGroup, PPHMMSignatureTable_UcfVirusVSRefDB in PPHMMSignatureTable_UcfVirus_Dict.items()}
+		PPHMMLocationTable_UcfVirus_Dict = {RefVirusGroup: np.hstack((PPHMMLocationTable_UcfVirusVSRefDB, PPHMMLocationTable_UcfVirusVSUcfDB)) for RefVirusGroup, PPHMMLocationTable_UcfVirusVSRefDB in PPHMMLocationTable_UcfVirus_Dict.items()}
 	
-	TaxoLabelList_UcfVirus	= map('_'.join, zip(	["Query%.4d"%i for i in range(len(SeqIDLists_UcfVirus))],
-							["/".join(SeqIDList) if len(SeqIDList)<=3 else "/".join(SeqIDList[0:3])+"/..." for SeqIDList in SeqIDLists_UcfVirus],
-							)
-					)
+	TaxoLabelList_UcfVirus	= list(map('_'.join, list(zip(["Query%.4d"%i for i in range(len(SeqIDLists_UcfVirus))],["/".join(SeqIDList) if len(SeqIDList)<=3 else "/".join(SeqIDList[0:3])+"/..." for SeqIDList in SeqIDLists_UcfVirus],))))
 	
 	N_UcfViruses		= len(SeqIDLists_UcfVirus)
 	N_RefVirusGroups	= len(ShelveDirs_RefVirus)
@@ -416,26 +413,26 @@ def VirusClassificationAndEvaluation (
 		VirusGroupingDict = {}
 	
 	RefVirusGroup_i		= 0
-	for ShelveDir_RefVirus, GenomeSeqFile_RefVirus in zip(ShelveDirs_RefVirus, GenomeSeqFiles_RefVirus):
+	for ShelveDir_RefVirus, GenomeSeqFile_RefVirus in list(zip(ShelveDirs_RefVirus, GenomeSeqFiles_RefVirus)):
 		RefVirusGroup_i = RefVirusGroup_i+1
 		RefVirusGroup = ShelveDir_RefVirus.split("/")[-1]
 		################################################################################
-		print "- Classify viruses using %s as reference (%d/%d)"%(RefVirusGroup, RefVirusGroup_i, N_RefVirusGroups)
+		print("- Classify viruses using %s as reference (%d/%d)"%(RefVirusGroup, RefVirusGroup_i, N_RefVirusGroups))
 		################################################################################
-		print "\tDefine dir/file paths"
+		print("\tDefine dir/file paths")
 		#-------------------------------------------------------------------------------
-		print "\t\tto program output shelve of the reference virus group"
+		print("\t\tto program output shelve of the reference virus group")
 		#-------------------------------------------------------------------------------
 		VariableShelveDir_RefVirus = ShelveDir_RefVirus+"/Shelves"
 		
-		print "\tRetrieve variables related to the reference virus group"
+		print("\tRetrieve variables related to the reference virus group")
 		#-------------------------------------------------------------------------------
 		if IncludeIncompleteGenomes_RefVirus == True:
-			print "\t\tfrom ReadGenomeDescTable.AllGenomes.shelve"
+			print("\t\tfrom ReadGenomeDescTable.AllGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/ReadGenomeDescTable.AllGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
-			print "\t\tfrom ReadGenomeDescTable.CompleteGenomes.shelve"
+			print("\t\tfrom ReadGenomeDescTable.CompleteGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/ReadGenomeDescTable.CompleteGenomes.shelve"
 		#VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/ReadGenomeDescTable.shelve"
@@ -450,7 +447,7 @@ def VirusClassificationAndEvaluation (
 				"TranslTableList",
 				]:
 			globals()[key] = Parameters[key]
-			print "\t\t\t" +  key
+			print("\t\t\t" +  key)
 		
 		Parameters.close()
 		
@@ -464,14 +461,14 @@ def VirusClassificationAndEvaluation (
 		
 		N_RefViruses		= len(SeqIDLists_RefVirus)
 		
-		print "\t\tfrom RefVirusAnnotator.shelve"
+		print("\t\tfrom RefVirusAnnotator.shelve")
 		#-------------------------------------------------------------------------------
 		if IncludeIncompleteGenomes_RefVirus == True:
-			print "\t\tfrom RefVirusAnnotator.AllGenomes.shelve"
+			print("\t\tfrom RefVirusAnnotator.AllGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/RefVirusAnnotator.AllGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
-			print "\t\tfrom RefVirusAnnotator.CompleteGenomes.shelve"
+			print("\t\tfrom RefVirusAnnotator.CompleteGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/RefVirusAnnotator.CompleteGenomes.shelve"
 		#VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/RefVirusAnnotator.shelve"
@@ -486,7 +483,7 @@ def VirusClassificationAndEvaluation (
 				]:
 			try:
 				globals()[key] = Parameters[key]
-				print "\t\t\t"+key
+				print("\t\t\t"+key)
 			except KeyError:
 				pass
 		
@@ -501,9 +498,9 @@ def VirusClassificationAndEvaluation (
 		GOMIDList_RefVirus		= copy(GOMIDList)
 		
 		if UseUcfVirusPPHMMs == True:
-			print "\tScan reference viruses against the PPHMM database of unclassified viruses to generate additional PPHMMSignatureTable, and PPHMMLocationTable"
+			print("\tScan reference viruses against the PPHMM database of unclassified viruses to generate additional PPHMMSignatureTable, and PPHMMLocationTable")
 			#-------------------------------------------------------------------------		
-			print "\t\tGenerate PPHMMSignatureTable, and PPHMMLocationTable"
+			print("\t\tGenerate PPHMMSignatureTable, and PPHMMLocationTable")
 			#-------------------------------------------------------------------------------
 			#Make HMMER_hmmscanDir
 			#-------------------------------------------------------------------------------
@@ -526,7 +523,7 @@ def VirusClassificationAndEvaluation (
 			#-------------------------------------------------------------------------------
 			_ = subprocess.call("rm -rf %s" %HMMER_hmmscanDir_UcfVirus, shell = True)	#Delete HMMER_hmmscanDir
 			
-			print "\tUpdate reference viruses' PPHMMSignatureTables, PPHMMLocationTables, and GOMSignatureTable"
+			print("\tUpdate reference viruses' PPHMMSignatureTables, PPHMMLocationTables, and GOMSignatureTable")
 			#-------------------------------------------------------------------------------
 			PPHMMSignatureTable_RefVirus	= np.hstack((PPHMMSignatureTable_RefVirus, PPHMMSignatureTable_RefVirusVSUcfDB))
 			PPHMMLocationTable_RefVirus	= np.hstack((PPHMMLocationTable_RefVirus, PPHMMLocationTable_RefVirusVSUcfDB))
@@ -539,13 +536,13 @@ def VirusClassificationAndEvaluation (
 												GOMDB			= UpdatedGOMDB_RefVirus,
 												GOMIDList		= GOMIDList_RefVirus)
 			
-			print "\tUpdate unclassified viruses' GOMSignatureTable"
+			print("\tUpdate unclassified viruses' GOMSignatureTable")
 			#-------------------------------------------------------------------------------
 			GOMSignatureTable_UcfVirus_Dict[RefVirusGroup] = GOMSignatureTable_Constructor (PPHMMLocationTable	= PPHMMLocationTable_UcfVirus_Dict[RefVirusGroup],
 													GOMDB			= UpdatedGOMDB_RefVirus,
 													GOMIDList		= GOMIDList_RefVirus)
 		
-		print "\tBuild the dendrogram, including all sequences"
+		print("\tBuild the dendrogram, including all sequences")
 		#-------------------------------------------------------------------------------
 		#Generate TaxoLabelList of reference viruses
 		#-------------------------------------------------------------------------------
@@ -578,13 +575,13 @@ def VirusClassificationAndEvaluation (
 		with open(VirusDendrogramFile, "w") as VirusDendrogram_txt:
 			VirusDendrogram_txt.write(VirusDendrogram)
 		
-		print "\tCompute similarity cut off for each taxonomic class"
+		print("\tCompute similarity cut off for each taxonomic class")
 		#-------------------------------------------------------------------------------
 		PairwiseSimilarityScore_Cutoff_Dict[RefVirusGroup] = PairwiseSimilarityScore_Cutoff_Dict_Constructor (	SimMat = SimMat[:N_RefViruses][:,:N_RefViruses],
 															TaxoGroupingList = TaxoGroupingList_RefVirus,
 															N_PairwiseSimilarityScores = N_PairwiseSimilarityScores)
 		
-		print "\tPropose a taxonomic class to each unclassified virus and evaluate the taxonomic assignments"
+		print("\tPropose a taxonomic class to each unclassified virus and evaluate the taxonomic assignments")
 		#-------------------------------------------------------------------------------
 		(MaxSimScoreList,
 		TaxoOfMaxSimScoreList,
@@ -603,7 +600,7 @@ def VirusClassificationAndEvaluation (
 		PhyloStatTable		= np.column_stack((PhyloStatTable, PhyloStatList))
 		
 		if VirusGrouping == True:
-			print "\tVirus grouping"
+			print("\tVirus grouping")
 			#-------------------------------------------------------------------------------
 			VirusGroupingDict[RefVirusGroup] = {}
 			VirusGroupingFile = VariableShelveDir_UcfVirus+"/VirusGrouping.RefVirusGroup=%s.IncompleteUcfRefGenomes=%s.Scheme=%s.Method=%s.p=%s.txt"%(RefVirusGroup, str(int(IncludeIncompleteGenomes_UcfVirus))+str(int(IncludeIncompleteGenomes_RefVirus)), SimilarityMeasurementScheme, Dendrogram_LinkageMethod, p)
@@ -631,7 +628,7 @@ def VirusClassificationAndEvaluation (
 			#Save result to file
 			#-------------------------------------------------------------------------------	
 			np.savetxt(	fname = VirusGroupingFile,
-					X = np.column_stack((	map(", ".join, SeqIDLists_RefVirus.tolist()+SeqIDLists_UcfVirus.tolist()),
+					X = np.column_stack((	list(map(", ".join, SeqIDLists_RefVirus.tolist()+SeqIDLists_UcfVirus.tolist())),
 								FamilyList_RefVirus.tolist()+[""]*N_UcfViruses,
 								GenusList_RefVirus.tolist()+[""]*N_UcfViruses,
 								VirusNameList_RefVirus.tolist()+VirusNameList_UcfVirus.tolist(),
@@ -653,7 +650,7 @@ def VirusClassificationAndEvaluation (
 							)
 		
 		if Bootstrap == True:
-			print "\tConstruct result distributions by using the bootstrapping technique"
+			print("\tConstruct result distributions by using the bootstrapping technique")
 			#-------------------------------------------------------------------------------
 			#Define path to dendrogram distribution file
 			#-------------------------------------------------------------------------------
@@ -673,9 +670,9 @@ def VirusClassificationAndEvaluation (
 			BootsrappedPhyloStatTable		= np.zeros((N_UcfViruses, 0))
 			N_PPHMMs				= PPHMMSignatureTable_AllVirus.shape[1]
 			for Bootstrap_i in range(0, N_Bootstrap):
-				print "\t\tRound %d"%(Bootstrap_i+1)
+				print("\t\tRound %d"%(Bootstrap_i+1))
 				#-------------------------------------------------------------------------------
-				print "\t\t\tBootstrap the data"
+				print("\t\t\tBootstrap the data")
 				#-------------------------------------------------------------------------------
 				#Construct bootstrapped PPHMMSignatureTable and PPHMMLocationTable"
 				#-------------------------------------------------------------------------------
@@ -693,7 +690,7 @@ def VirusClassificationAndEvaluation (
 													GOMDB			= BootstrappedGOMDB,
 													GOMIDList		= GOMIDList)
 				
-				print "\t\t\tConstruct a dendrogram from the bootstrapped data"
+				print("\t\t\tConstruct a dendrogram from the bootstrapped data")
 				#-------------------------------------------------------------------------------
 				BootstrappedSimMat = SimilarityMat_Constructor(	PPHMMSignatureTable	= BootstrappedPPHMMSignatureTable,
 										GOMSignatureTable	= BootstrappedGOMSignatureTable,
@@ -709,13 +706,13 @@ def VirusClassificationAndEvaluation (
 				with open(VirusDendrogramDistFile, "a") as VirusDendrogramDist_txt:
 					VirusDendrogramDist_txt.write(BootstrappedVirusDendrogram+"\n")
 				
-				print "\t\t\tCompute similarity cut off for each taxonomic class based on the bootstrapped data"
+				print("\t\t\tCompute similarity cut off for each taxonomic class based on the bootstrapped data")
 				#-------------------------------------------------------------------------------
 				PairwiseSimilarityScore_CutoffDist_Dict[Bootstrap_i][RefVirusGroup] = PairwiseSimilarityScore_Cutoff_Dict_Constructor (	SimMat = BootstrappedSimMat[:N_RefViruses][:,:N_RefViruses],
 																			TaxoGroupingList = TaxoGroupingList_RefVirus,
 																			N_PairwiseSimilarityScores = N_PairwiseSimilarityScores)
 				
-				print "\t\t\tPropose a taxonomic class to each unclassified virus and evaluate the taxonomic assignments based on the bootstrapped data"
+				print("\t\t\tPropose a taxonomic class to each unclassified virus and evaluate the taxonomic assignments based on the bootstrapped data")
 				#-------------------------------------------------------------------------------
 				(BootsrappedMaxSimScoreList,
 				BootsrappedTaxoOfMaxSimScoreList,
@@ -738,7 +735,7 @@ def VirusClassificationAndEvaluation (
 			TaxoAssignmentDistTable		= np.append(TaxoAssignmentDistTable,	BootsrappedTaxoAssignmentTable.T[...,None],	axis = 2)
 			PhyloStatDistTable		= np.append(PhyloStatDistTable,		BootsrappedPhyloStatTable.T[...,None],		axis = 2)
 			
-			print "\t\tCreat a bootstrapped dendrogram"
+			print("\t\tCreat a bootstrapped dendrogram")
 			#-------------------------------------------------------------------------------
 			if Bootstrap_method == "booster":
 				_ = subprocess.Popen("booster -i %s -b %s -o %s -@ %d "%(VirusDendrogramFile,
@@ -754,10 +751,10 @@ def VirusClassificationAndEvaluation (
 																										stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
 				out, err = _.communicate()
 			else:
-				print "'Bootstrap_method' can either be 'booster' or 'sumtrees'."
+				print("'Bootstrap_method' can either be 'booster' or 'sumtrees'.")
 		
 		if Heatmap_WithDendrogram == True:
-			print "\tConstruct GRAViTy heat map with dendrogram"
+			print("\tConstruct GRAViTy heat map with dendrogram")
 			#-------------------------------------------------------------------------------
 			#Load the tree
 			#-------------------------------------------------------------------------------
@@ -798,7 +795,7 @@ def VirusClassificationAndEvaluation (
 			#Labels, label positions, and ticks
 			#-------------------------------------------------------------------------------
 			TaxoGroupingList_AllVirus	= TaxoGroupingList_RefVirus.tolist() + TaxoAssignmentList
-			Taxo2ClassDict		= {TaxoLabel: TaxoGrouping for TaxoLabel, TaxoGrouping in zip(TaxoLabelList_AllVirus, TaxoGroupingList_AllVirus)}
+			Taxo2ClassDict		= {TaxoLabel: TaxoGrouping for TaxoLabel, TaxoGrouping in list(zip(TaxoLabelList_AllVirus, TaxoGroupingList_AllVirus))}
 			ClassDendrogram		= copy(VirusDendrogram)
 			for Clade in ClassDendrogram.find_clades(terminal=True):
 				Clade.name = Taxo2ClassDict[Clade.name]
@@ -810,7 +807,7 @@ def VirusClassificationAndEvaluation (
 				FarLeftNode = TerminalNodeList[0]
 				for Clade in ([ClassDendrogram]+ClassDendrogram.get_path(FarLeftNode)):
 					DescendantNodeList = Clade.get_terminals()
-					DescendantClassLabelList = list(set(map(lambda c: c.name, DescendantNodeList)))
+					DescendantClassLabelList = list(set(list(map(lambda c: c.name, DescendantNodeList))))
 					if len(DescendantClassLabelList)==1:
 						ClassLabelList.append(DescendantClassLabelList[0])
 						LineList.append(LineList[-1]+len(DescendantNodeList))
@@ -819,7 +816,7 @@ def VirusClassificationAndEvaluation (
 			
 			ClassLabelList	= np.array(ClassLabelList)
 			LineList	= np.array(LineList) + 0.5
-			TickLocList	= np.array(map(np.mean, zip(LineList[0:-1],LineList[1:])))
+			TickLocList	= np.array(list(map(np.mean, list(zip(LineList[0:-1],LineList[1:])))))
 			
 			#Heat map colour indicators
 			#-------------------------------------------------------------------------------
@@ -915,7 +912,7 @@ def VirusClassificationAndEvaluation (
 			
 			ax_Dendrogram		= fig.add_axes([ax_Dendrogram_L, ax_Dendrogram_B, ax_Dendrogram_W, ax_Dendrogram_H], frame_on = False, facecolor = "white")
 			Phylo			.draw(VirusDendrogram, label_func = lambda x: "", do_show = False,  axes = ax_Dendrogram)
-			VirusDendrogramDepth	= max([v for k,v in VirusDendrogram.depths().iteritems()])
+			VirusDendrogramDepth	= max([v for k,v in VirusDendrogram.depths().items()])
 			ax_Dendrogram		.set_xlim([(VirusDendrogramDepth - 1), VirusDendrogramDepth])
 			ax_Dendrogram		.set_ylim([N_Viruses+0.5, 0.5])
 			ax_Dendrogram		.set_axis_off()
@@ -928,7 +925,7 @@ def VirusClassificationAndEvaluation (
 			
 			ax_ScaleBar		.set_xlim([1, 0])
 			ax_ScaleBar		.set_xticks(ScaleBarTicks)
-			ax_ScaleBar		.set_xticklabels(map(str, ScaleBarTicks), rotation = 0, size = FontSize)
+			ax_ScaleBar		.set_xticklabels(list(map(str, ScaleBarTicks)), rotation = 0, size = FontSize)
 			ax_ScaleBar		.set_xlabel('Distance', rotation = 0, size = FontSize+2)
 			ax_ScaleBar		.xaxis.set_label_position('bottom')
 			ax_ScaleBar		.tick_params(	top = 'off',
@@ -1012,7 +1009,7 @@ def VirusClassificationAndEvaluation (
 			plt.savefig(HeatmapWithDendrogramFile, format = "pdf")
 	
 	################################################################################
-	print "- Pool results from all classfiers, and finalise the taxonomic assignment (and virus grouping)"
+	print("- Pool results from all classfiers, and finalise the taxonomic assignment (and virus grouping)")
 	################################################################################
 	if VirusGrouping == True:
 		FinalisedTaxoAssignmentList	= []
@@ -1056,7 +1053,7 @@ def VirusClassificationAndEvaluation (
 				else:
 					FinalisedTaxoAssignmentList.append("Unclassified (%s)"%RefVirusGroup)
 	
-	RemainedUcfVirus_IndexList = np.where(map(all, MaxSimScoreTable <= DatabaseAssignmentSimilarityScore_Cutoff))[0]
+	RemainedUcfVirus_IndexList = np.where(list(map(all, MaxSimScoreTable <= DatabaseAssignmentSimilarityScore_Cutoff)))[0]
 	SeqIDLists_RemainedUcfVirus = SeqIDLists_UcfVirus[RemainedUcfVirus_IndexList]
 	VirusNameList_RemainedUcfVirus = VirusNameList_UcfVirus[RemainedUcfVirus_IndexList]
 	
@@ -1079,8 +1076,8 @@ def VirusClassificationAndEvaluation (
 				TaxoOfMaxSimScoreDist_Counter = sorted(Counter(TaxoOfMaxSimScoreDistTable[:, UcfVirus_i, RefVirusGroup_i]).items(), key = operator.itemgetter(1), reverse = True)
 				
 				TaxoOfMaxSimScoreRangeList.append(", ".join(["%s: %.2f"%(Taxo, Count/float(N_Bootstrap)) for Taxo, Count in TaxoOfMaxSimScoreDist_Counter]))
-				MaxSimScoreRangeList.append(", ".join(["%s: %s"%(Taxo, "-".join(map(str,np.around(hpd(x = MaxSimScoreDistTable[np.where(TaxoOfMaxSimScoreDistTable[:, UcfVirus_i, RefVirusGroup_i]==Taxo)[0], UcfVirus_i, RefVirusGroup_i], alpha = 0.05),3)))) for Taxo in zip(*TaxoOfMaxSimScoreDist_Counter)[0]]))
-				PhyloStatRangeList.append(", ".join(["%s: %s"%(Taxo, ",".join(map(lambda x: "p(%s): %s"%(x[0], x[1]/float(N_Bootstrap)), sorted(Counter(PhyloStatDistTable[np.where(TaxoOfMaxSimScoreDistTable[:, UcfVirus_i, RefVirusGroup_i]==Taxo)[0], UcfVirus_i, RefVirusGroup_i]).items(), key = operator.itemgetter(1), reverse = True)))) for Taxo in zip(*TaxoOfMaxSimScoreDist_Counter)[0]]))
+				MaxSimScoreRangeList.append(", ".join(["%s: %s"%(Taxo, "-".join(list(map(str,np.around(hpd(x = MaxSimScoreDistTable[np.where(TaxoOfMaxSimScoreDistTable[:, UcfVirus_i, RefVirusGroup_i]==Taxo)[0], UcfVirus_i, RefVirusGroup_i], alpha = 0.05),3))))) for Taxo in list(zip(*TaxoOfMaxSimScoreDist_Counter))[0]]))
+				PhyloStatRangeList.append(", ".join(["%s: %s"%(Taxo, ",".join(list(map(lambda x: "p(%s): %s"%(x[0], x[1]/float(N_Bootstrap)), sorted(Counter(PhyloStatDistTable[np.where(TaxoOfMaxSimScoreDistTable[:, UcfVirus_i, RefVirusGroup_i]==Taxo)[0], UcfVirus_i, RefVirusGroup_i]).items(), key = operator.itemgetter(1), reverse = True))))) for Taxo in list(zip(*TaxoOfMaxSimScoreDist_Counter))[0]]))
 				TaxoAssignmentRangeList.append(", ".join(["%s: %.2f"%(Taxo, Count/float(N_Bootstrap)) for Taxo, Count in sorted(Counter(TaxoAssignmentDistTable[:, UcfVirus_i, RefVirusGroup_i]).items(), key = operator.itemgetter(1), reverse = True)]))
 			
 			TaxoOfMaxSimScoreRangeTable = np.column_stack((TaxoOfMaxSimScoreRangeTable, TaxoOfMaxSimScoreRangeList))
@@ -1105,17 +1102,17 @@ def VirusClassificationAndEvaluation (
 			FinalisedTaxoAssignmentRangeList.append(", ".join(["%s: %.2f"%(Taxo, Count/float(N_Bootstrap)) for Taxo, Count in sorted(Counter(BootstrappedFinalisedTaxoAssignmentList).items(), key = operator.itemgetter(1), reverse = True)]))
 	
 	################################################################################
-	print "- Write the results to ClassificationResults.txt"
+	print("- Write the results to ClassificationResults.txt")
 	################################################################################
 	if Bootstrap == True:
 		np.savetxt(	fname = ClassificationResultFile,
-				X = np.column_stack((	map(', '.join, SeqIDLists_UcfVirus),
+				X = np.column_stack((	list(map(', '.join, SeqIDLists_UcfVirus)),
 							VirusNameList_UcfVirus,
-							map(lambda (TaxoOfMaxSimScore, TaxoOfMaxSimScoreRange): ", ".join(["%s (%s)"%(Taxo, Range) for Taxo, Range in zip(TaxoOfMaxSimScore, TaxoOfMaxSimScoreRange)]), zip(TaxoOfMaxSimScoreTable, TaxoOfMaxSimScoreRangeTable)),
-							map(lambda (MaxSimScore, MaxSimScoreRange): ", ".join(["%s (%s)"%(Score, Range) for Score, Range in zip(MaxSimScore, MaxSimScoreRange)]), zip(np.around(MaxSimScoreTable,3).astype("str"), MaxSimScoreRangeTable)),
-							map(lambda (PhyloStat, PhyloStatRange): ", ".join(["%s (%s)"%(Stat, Range) for Stat, Range in zip(PhyloStat, PhyloStatRange)]), zip(PhyloStatTable, PhyloStatRangeTable)),
-							map(lambda (TaxoAssignment, TaxoAssignmentRange): ", ".join(["%s (%s)"%(Taxo, Range) for Taxo, Range in zip(TaxoAssignment, TaxoAssignmentRange)]), zip(TaxoAssignmentTable, TaxoAssignmentRangeTable)),
-							map(lambda (FinalisedTaxoAssignment, FinalisedTaxoAssignmentRange): "%s (%s)"%(FinalisedTaxoAssignment, FinalisedTaxoAssignmentRange), zip(FinalisedTaxoAssignmentList, FinalisedTaxoAssignmentRangeList)),
+							list(map(lambda TaxoOfMaxSimScore, TaxoOfMaxSimScoreRange: ", ".join(["%s (%s)"%(Taxo, Range) for Taxo, Range in zip(TaxoOfMaxSimScore, TaxoOfMaxSimScoreRange)]), zip(TaxoOfMaxSimScoreTable, TaxoOfMaxSimScoreRangeTable))),
+							list(map(lambda MaxSimScore, MaxSimScoreRange: ", ".join(["%s (%s)"%(Score, Range) for Score, Range in zip(MaxSimScore, MaxSimScoreRange)]), zip(np.around(MaxSimScoreTable,3).astype("str"), MaxSimScoreRangeTable))),
+							list(map(lambda PhyloStat, PhyloStatRange: ", ".join(["%s (%s)"%(Stat, Range) for Stat, Range in zip(PhyloStat, PhyloStatRange)]), zip(PhyloStatTable, PhyloStatRangeTable))),
+							list(map(lambda TaxoAssignment, TaxoAssignmentRange: ", ".join(["%s (%s)"%(Taxo, Range) for Taxo, Range in zip(TaxoAssignment, TaxoAssignmentRange)]), zip(TaxoAssignmentTable, TaxoAssignmentRangeTable))),
+							list(map(lambda FinalisedTaxoAssignment, FinalisedTaxoAssignmentRange: "%s (%s)"%(FinalisedTaxoAssignment, FinalisedTaxoAssignmentRange), zip(FinalisedTaxoAssignmentList, FinalisedTaxoAssignmentRangeList))),
 							FinalisedVirusGroupingList,
 							)),
 				fmt = '%s',
@@ -1125,7 +1122,7 @@ def VirusClassificationAndEvaluation (
 		with open(ClassificationResultFile, "a") as ClassificationResult_txt:
 			ClassificationResult_txt.write(	"\n"+
 							"*Similarity score cutoff\n"+
-							"\n".join(["%s, %s: %.4f (%s)"%(RefVirusGroup, TaxoGrouping, d["CutOff"], "-".join(np.around(hpd(np.array([PairwiseSimilarityScore_CutoffDist_Dict[BootStrap_i][RefVirusGroup][TaxoGrouping]["CutOff"] for BootStrap_i in range(N_Bootstrap)])),3).astype("str"))) for RefVirusGroup, D in PairwiseSimilarityScore_Cutoff_Dict.iteritems() for TaxoGrouping, d in D.iteritems()])+
+							"\n".join(["%s, %s: %.4f (%s)"%(RefVirusGroup, TaxoGrouping, d["CutOff"], "-".join(np.around(hpd(np.array([PairwiseSimilarityScore_CutoffDist_Dict[BootStrap_i][RefVirusGroup][TaxoGrouping]["CutOff"] for BootStrap_i in range(N_Bootstrap)])),3).astype("str"))) for RefVirusGroup, D in PairwiseSimilarityScore_Cutoff_Dict.items() for TaxoGrouping, d in D.items()])+
 							"\n\n"+
 							"**Support from dendrogram\n"+
 							"NA:the sequence is not similar enough to any of the reference sequences to be assigned to any classes\n"
@@ -1138,12 +1135,12 @@ def VirusClassificationAndEvaluation (
 							)
 	else:
 		np.savetxt(	fname = ClassificationResultFile,
-				X = np.column_stack((	map(', '.join, SeqIDLists_UcfVirus),
+				X = np.column_stack((	list(map(', '.join, SeqIDLists_UcfVirus)),
 							VirusNameList_UcfVirus,
-							map(', '.join, TaxoOfMaxSimScoreTable),
-							map(', '.join, np.around(MaxSimScoreTable,3).astype("str")),
-							map(', '.join, PhyloStatTable),
-							map(', '.join, TaxoAssignmentTable),
+							list(map(', '.join, TaxoOfMaxSimScoreTable)),
+							list(map(', '.join, np.around(MaxSimScoreTable,3)).astype("str")),
+							list(map(', '.join, PhyloStatTable)),
+							list(map(', '.join, TaxoAssignmentTable)),
 							FinalisedTaxoAssignmentList,
 							FinalisedVirusGroupingList,
 							)),
@@ -1154,7 +1151,7 @@ def VirusClassificationAndEvaluation (
 		with open(ClassificationResultFile, "a") as ClassificationResult_txt:
 			ClassificationResult_txt.write(	"\n"+
 							"*Similarity score cutoff\n"+
-							"\n".join(["%s, %s: %.4f"%(RefVirusGroup, TaxoGrouping, d["CutOff"]) for RefVirusGroup, D in PairwiseSimilarityScore_Cutoff_Dict.iteritems() for TaxoGrouping, d in D.iteritems()])+
+							"\n".join(["%s, %s: %.4f"%(RefVirusGroup, TaxoGrouping, d["CutOff"]) for RefVirusGroup, D in PairwiseSimilarityScore_Cutoff_Dict.items() for TaxoGrouping, d in D.items()])+
 							"\n\n"+
 							"**Support from dendrogram\n"+
 							"NA:the sequence is not similar enough to any of the reference sequences to be assigned to any classes\n"
@@ -1169,23 +1166,23 @@ def VirusClassificationAndEvaluation (
 	if IncludeIncompleteGenomes_UcfVirus == True:
 		if IncludeIncompleteGenomes_RefVirus == True:
 			################################################################################
-			print "- Save variables to VirusClassificationAndEvaluation.AllUcfGenomes.AllRefGenomes.shelve"
+			print("- Save variables to VirusClassificationAndEvaluation.AllUcfGenomes.AllRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/VirusClassificationAndEvaluation.AllUcfGenomes.AllRefGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
 			################################################################################
-			print "- Save variables to VirusClassificationAndEvaluation.AllUcfGenomes.CompleteRefGenomes.shelve"
+			print("- Save variables to VirusClassificationAndEvaluation.AllUcfGenomes.CompleteRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/VirusClassificationAndEvaluation.AllUcfGenomes.CompleteRefGenomes.shelve"
 	elif IncludeIncompleteGenomes_UcfVirus == False:
 		if IncludeIncompleteGenomes_RefVirus == True:
 			################################################################################
-			print "- Save variables to VirusClassificationAndEvaluation.CompleteUcfGenomes.AllRefGenomes.shelve"
+			print("- Save variables to VirusClassificationAndEvaluation.CompleteUcfGenomes.AllRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/VirusClassificationAndEvaluation.CompleteUcfGenomes.AllRefGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
 			################################################################################
-			print "- Save variables to VirusClassificationAndEvaluation.CompleteUcfGenomes.CompleteRefGenomes.shelve"
+			print("- Save variables to VirusClassificationAndEvaluation.CompleteUcfGenomes.CompleteRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/VirusClassificationAndEvaluation.CompleteUcfGenomes.CompleteRefGenomes.shelve"
 	

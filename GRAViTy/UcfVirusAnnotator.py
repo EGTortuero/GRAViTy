@@ -18,10 +18,10 @@ def UcfVirusAnnotator (
 	HMMER_C_EValue_Cutoff			= 1E-3,
 	HMMER_HitScore_Cutoff			= 0,
 	):
-	print "################################################################################"
-	print "#Generate PPHMM signature table, PPHMM location table, and GOM signature table #"
-	print "#for unclassified viruses, using PPHMM databases of reference viruses          #"
-	print "################################################################################"
+	print("################################################################################")
+	print("#Generate PPHMM signature table, PPHMM location table, and GOM signature table #")
+	print("#for unclassified viruses, using PPHMM databases of reference viruses          #")
+	print("################################################################################")
 	'''
 	Generate PPHMM signature table, PPHMM location table, and GOM signature table for unclassified viruses, using PPHMM databases of reference viruses
 	---------------------------------------------
@@ -29,21 +29,21 @@ def UcfVirusAnnotator (
 	ShelveDirs_RefVirus	= ShelveDirs_RefVirus.split(", ")
 	
 	################################################################################
-	print "- Define dir/file paths"
+	print("- Define dir/file paths")
 	################################################################################
-	print "\tto program output shelve"
+	print("\tto program output shelve")
 	#-------------------------------------------------------------------------------
 	VariableShelveDir_UcfVirus	= ShelveDir_UcfVirus+"/Shelves"
 	
 	################################################################################
-	print "- Retrieve variables"
+	print("- Retrieve variables")
 	################################################################################
 	if IncludeIncompleteGenomes_UcfVirus == True:
-		print "\tfrom ReadGenomeDescTable.AllGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.AllGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/ReadGenomeDescTable.AllGenomes.shelve"
 	elif IncludeIncompleteGenomes_UcfVirus == False:
-		print "\tfrom ReadGenomeDescTable.CompleteGenomes.shelve"
+		print("\tfrom ReadGenomeDescTable.CompleteGenomes.shelve")
 		#-------------------------------------------------------------------------------
 		VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/ReadGenomeDescTable.CompleteGenomes.shelve"
 	
@@ -54,7 +54,7 @@ def UcfVirusAnnotator (
 			"TranslTableList",
 			]:
 		globals()[key] = Parameters[key]
-		print "\t\t" + key
+		print("\t\t" + key)
 	
 	Parameters.close()
 	SeqIDLists_UcfVirus = copy(SeqIDLists)
@@ -62,11 +62,11 @@ def UcfVirusAnnotator (
 	
 	if not os.path.isfile(GenomeSeqFile_UcfVirus):
 		################################################################################
-		print "- Download GenBank file"
+		print("- Download GenBank file")
 		################################################################################
-		print "GenomeSeqFile_UcfVirus doesn't exist. GRAViTy is downloading the GenBank file(s)"
-		print "Here are the accession numbers to be downloaded: "
-		print "\n".join(map(lambda x:"\n".join(x), SeqIDLists_UcfVirus))
+		print("GenomeSeqFile_UcfVirus doesn't exist. GRAViTy is downloading the GenBank file(s)")
+		print("Here are the accession numbers to be downloaded: ")
+		print("\n".join(list(map(lambda x:"\n".join(x), SeqIDLists_UcfVirus))))
 		DownloadGenBankFile (GenomeSeqFile = GenomeSeqFile_UcfVirus, SeqIDLists = SeqIDLists_UcfVirus)
 	
 	PPHMMSignatureTable_Dict= {}
@@ -78,25 +78,25 @@ def UcfVirusAnnotator (
 		RefVirusGroup_i = RefVirusGroup_i+1
 		RefVirusGroup = ShelveDir_RefVirus.split("/")[-1]
 		################################################################################
-		print "- Annotate unclassified viruses using the PPHMM and GOM databases of the reference viruses: %s (%d/%d)"%(RefVirusGroup, RefVirusGroup_i, N_RefVirusGroups)
+		print("- Annotate unclassified viruses using the PPHMM and GOM databases of the reference viruses: %s (%d/%d)"%(RefVirusGroup, RefVirusGroup_i, N_RefVirusGroups))
 		################################################################################
-		print "\tDefine dir/file paths"
+		print("\tDefine dir/file paths")
 		#-------------------------------------------------------------------------------
-		print "\t\tto HMMER PPHMM database of the reference virus group"
+		print("\t\tto HMMER PPHMM database of the reference virus group")
 		#-------------------------------------------------------------------------------
 		HMMERDir_RefVirus		= ShelveDir_RefVirus+"/HMMER"
 		HMMER_PPHMMDBDir_RefVirus	= HMMERDir_RefVirus+"/HMMER_PPHMMDB"
 		HMMER_PPHMMDB_RefVirus		= HMMER_PPHMMDBDir_RefVirus+"/HMMER_PPHMMDB"
 		
-		print "\tRetrieve variables related to the reference viruses"
+		print("\tRetrieve variables related to the reference viruses")
 		#-------------------------------------------------------------------------------
 		VariableShelveDir_RefVirus	= ShelveDir_RefVirus+"/Shelves" 
 		if IncludeIncompleteGenomes_RefVirus == True:
-			print "\t\tfrom RefVirusAnnotator.AllGenomes.shelve"
+			print("\t\tfrom RefVirusAnnotator.AllGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/RefVirusAnnotator.AllGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
-			print "\t\tfrom RefVirusAnnotator.CompleteGenomes.shelve"
+			print("\t\tfrom RefVirusAnnotator.CompleteGenomes.shelve")
 			#-------------------------------------------------------------------------------
 			VariableShelveFile_RefVirus = VariableShelveDir_RefVirus+"/RefVirusAnnotator.CompleteGenomes.shelve"
 		
@@ -110,17 +110,17 @@ def UcfVirusAnnotator (
 				]:
 			try:
 				globals()[key] = Parameters[key]
-				print "\t\t\t"+key
+				print("\t\t\t"+key)
 			except KeyError:
 				pass
 		
 		Parameters.close()
 		
 		GOMIDList_RefVirus = copy(GOMIDList)
-		if "GOMDB_coo" in globals().keys(): globals()["GOMDB"] = {GOMID:GOM_coo.toarray() for GOMID, GOM_coo in GOMDB_coo.iteritems()}
+		if "GOMDB_coo" in globals().keys(): globals()["GOMDB"] = {GOMID:GOM_coo.toarray() for GOMID, GOM_coo in GOMDB_coo.items()}
 		GOMDB_RefVirus = copy(GOMDB)
 		
-		print "\tGenerate PPHMMSignatureTable, PPHMMLocationTable, and GOMSignatureTable for unclassified viruses using the reference PPHMM and GOM database"
+		print("\tGenerate PPHMMSignatureTable, PPHMMLocationTable, and GOMSignatureTable for unclassified viruses using the reference PPHMM and GOM database")
 		#-------------------------------------------------------------------------------
 		#Make HMMER_hmmscanDir
 		#-------------------------------------------------------------------------------
@@ -154,30 +154,30 @@ def UcfVirusAnnotator (
 	if IncludeIncompleteGenomes_UcfVirus == True:
 		if IncludeIncompleteGenomes_RefVirus == True:
 			################################################################################
-			print "- Save variables to UcfVirusAnnotator.AllUcfGenomes.AllRefGenomes.shelve"
+			print("- Save variables to UcfVirusAnnotator.AllUcfGenomes.AllRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.AllUcfGenomes.AllRefGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
 			################################################################################
-			print "- Save variables to UcfVirusAnnotator.AllUcfGenomes.CompleteRefGenomes.shelve"
+			print("- Save variables to UcfVirusAnnotator.AllUcfGenomes.CompleteRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.AllUcfGenomes.CompleteRefGenomes.shelve"
 	elif IncludeIncompleteGenomes_UcfVirus == False:
 		if IncludeIncompleteGenomes_RefVirus == True:
 			################################################################################
-			print "- Save variables to UcfVirusAnnotator.CompleteUcfGenomes.AllRefGenomes.shelve"
+			print("- Save variables to UcfVirusAnnotator.CompleteUcfGenomes.AllRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.CompleteUcfGenomes.AllRefGenomes.shelve"
 		elif IncludeIncompleteGenomes_RefVirus == False:
 			################################################################################
-			print "- Save variables to UcfVirusAnnotator.CompleteUcfGenomes.CompleteRefGenomes.shelve"
+			print("- Save variables to UcfVirusAnnotator.CompleteUcfGenomes.CompleteRefGenomes.shelve")
 			################################################################################
 			VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.CompleteUcfGenomes.CompleteRefGenomes.shelve"
 	
 	#VariableShelveFile_UcfVirus = VariableShelveDir_UcfVirus+"/UcfVirusAnnotator.shelve"
 	from scipy.sparse import coo_matrix
-	PPHMMSignatureTable_Dict_coo = {RefVirusGroup:coo_matrix(PPHMMSignatureTable) for RefVirusGroup, PPHMMSignatureTable in PPHMMSignatureTable_Dict.iteritems()}
-	PPHMMLocationTable_Dict_coo = {RefVirusGroup:coo_matrix(PPHMMLocationTable) for RefVirusGroup, PPHMMLocationTable in PPHMMLocationTable_Dict.iteritems()}
+	PPHMMSignatureTable_Dict_coo = {RefVirusGroup:coo_matrix(PPHMMSignatureTable) for RefVirusGroup, PPHMMSignatureTable in PPHMMSignatureTable_Dict.items()}
+	PPHMMLocationTable_Dict_coo = {RefVirusGroup:coo_matrix(PPHMMLocationTable) for RefVirusGroup, PPHMMLocationTable in PPHMMLocationTable_Dict.items()}
 	
 	Parameters = shelve.open(VariableShelveFile_UcfVirus,"n")
 	for key in [	#"PPHMMSignatureTable_Dict",
@@ -188,7 +188,7 @@ def UcfVirusAnnotator (
 			]:
 		try:
 			Parameters[key] = locals()[key]
-			print "\t" + key
+			print("\t" + key)
 		except TypeError:
 			pass
 	
