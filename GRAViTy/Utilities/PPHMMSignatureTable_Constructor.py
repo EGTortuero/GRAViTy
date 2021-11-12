@@ -21,7 +21,7 @@ def PPHMMSignatureTable_Constructor (
 	_, file_extension = os.path.splitext(GenBankFile)
 	if file_extension in [".fas", ".fasta"]:
 		Records_dict = SeqIO.index(GenBankFile, "fasta")
-	elif file_extension in [".gb"]:
+	elif file_extension in [".gb", ".gbk"]:
 		Records_dict = SeqIO.index(GenBankFile, "genbank")
 	
 	Records_dict = {k.split(".")[0]:v for k,v in Records_dict.items()}
